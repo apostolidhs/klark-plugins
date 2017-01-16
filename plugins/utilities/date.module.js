@@ -1,14 +1,12 @@
-/* jshint esversion:6, node:true  */
-
 'use strict';
 
-KlarkModule(module, 'utilitiesDate', ($_, $moment) => {
+KlarkModule(module, 'krkUtilitiesDate', function($_, $moment) {
 
-  const dateFormat = 'MM/DD/YYYY HH:mm:ss';
+  var dateFormat = 'MM/DD/YYYY HH:mm:ss';
 
   return {
-    stringify,
-    duration
+    stringify: stringify,
+    duration: duration
   };
 
   function stringify(date) {

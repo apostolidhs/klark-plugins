@@ -1,5 +1,7 @@
 'use strict';
 
+// TODO: more generic
+
 KlarkModule(module, 'krkRoutesMultimedia', function(
   $q,
   $_,

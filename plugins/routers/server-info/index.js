@@ -3,7 +3,7 @@
 KlarkModule(module, 'krkRoutesServerInfo', function(krkMiddlewareResponse) {
 
   return {
-    register
+    register: register
   };
 
   function register(app, config) {
