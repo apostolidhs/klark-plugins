@@ -11,10 +11,10 @@ KlarkModule(module, 'krkMiddlewarePermissions', function(
   var options;
 
   return {
-    check,
-    createJWT,
-    decodeJWT,
-    setOptions
+    check: check,
+    createJWT: createJWT,
+    decodeJWT: decodeJWT,
+    setOptions: setOptions
   };
 
   function check(permission) {

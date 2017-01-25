@@ -1,17 +1,17 @@
 'use strict';
 
-KlarkModule(module, 'krkCrudGenerator', (
+KlarkModule(module, 'krkCrudGenerator', function(
   $_,
   krkMiddlewareParameterValidator,
   krkMiddlewarePermissions,
   krkMiddlewareCrudController,
   krkMiddlewareResponse,
   krkCrudGeneratorUrls
-) => {
+) {
 
   return {
-    create,
-    createSingle
+    create: create,
+    createSingle: createSingle
   };
 
   function create(app, customOpts) {

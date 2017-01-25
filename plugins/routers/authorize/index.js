@@ -19,7 +19,8 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
   };
 
   function register(app, config) {
-    if (!(app && config && config.apiUrlPrefix && config.appUrl)) {
+    if (!(app && config && config.apiUrlPrefix && config.appUrl
+      && config.EMAIL_SMTP && config.EMAIL_NAME && config.EMAIL_ADDRESS)) {
       throw new Error('Invalid arguments');
     }
 
@@ -128,7 +129,11 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
             return user;
           }
           var emailTemplate = krkRoutersAuthorizeVerifyAccountEmailTmpl.template(user, verifyAccountRoute);
-          return krkNotificationsEmail.send(emailTemplate)
+          return krkNotificationsEmail.send(emailTemplate, {
+            EMAIL_SMTP: config.EMAIL_SMTP,
+            EMAIL_NAME: config.EMAIL_NAME,
+            EMAIL_ADDRESS: config.EMAIL_ADDRESS
+          })
             .catch(function(reason) {
               res.locals.errors.add('EMAIL_FAIL', reason.errors || reason);
               next(true);

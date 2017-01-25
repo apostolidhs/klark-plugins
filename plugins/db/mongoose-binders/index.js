@@ -3,15 +3,15 @@
 KlarkModule(module, 'krkDbMongooseBinders', function($_, $mongoose, krkLogger, krkModelsApp) {
 
   return {
-    create,
-    findByIdAndUpdate,
-    findById,
-    find,
-    count,
-    remove,
+    create: create,
+    findByIdAndUpdate: findByIdAndUpdate,
+    findById: findById,
+    find: find,
+    count: count,
+    remove: remove,
 
-    getAppInfo,
-    updateAppInfo
+    getAppInfo: getAppInfo,
+    updateAppInfo: updateAppInfo
   };
 
   function getAppInfo() {

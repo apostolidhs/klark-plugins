@@ -1,6 +1,6 @@
 'use strict';
 
-KlarkModule(module, 'routesUsers', function(
+KlarkModule(module, 'krkRoutesUsers', function(
   $crypto,
   $q,
   $_,

@@ -3,7 +3,7 @@
 KlarkModule(module, 'krkNotificationsEmail', function($_, $q, $nodemailer) {
 
   return {
-    send
+    send: send
   };
 
   function send(opts, config) {

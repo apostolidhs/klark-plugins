@@ -4,7 +4,7 @@ KlarkModule(module, 'krkMiddlewareParameterValidator', function($q, $_, krkParam
 
   var defaultPagination = {
     page: 1,
-    count: 100
+    count: 50
   };
 
   return {

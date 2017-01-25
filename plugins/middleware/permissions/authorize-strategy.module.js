@@ -7,7 +7,7 @@ KlarkModule(module, 'krkMiddlewarePermissionsAuthorizeStrategy', function(
 ) {
 
   return {
-    register
+    register: register
   };
 
   function register(passport, jwtSecret) {

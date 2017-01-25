@@ -27,11 +27,11 @@ KlarkModule(module, 'krkDbMongooseConnector', function($q, $mongoose, krkLogger)
     $mongoose.connect(mongodbUrl);
     var db = $mongoose.connection;
     db.on('error', function(err) {
-      logger.error('Connection error:', err);
+      krkLogger.error('Connection error:', err);
       deffered.reject(err);
     });
     db.once('open', function() {
-      logger.info('Connected to mongo');
+      krkLogger.info('Connected to mongo');
       deffered.resolve();
     });
 
