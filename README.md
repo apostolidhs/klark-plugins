@@ -56,9 +56,9 @@ We created a collection of middlewares and utilities in order to automate the CR
 
 ## Install plugins
 
-1) In the root project folder install klark-plugins
+1) In the root project folder install klark-js-plugins
 
-> `npm install --save klark-plugins`
+> `npm install --save klark-js-plugins`
 
 2) Open the file that contains the Klark registration code.
 
@@ -67,7 +67,7 @@ var modules = `plugins/**/index.js`;
 var subModules = `plugins/**/*.module.js`;
 
 // locate the klark plugins inside the node_modules folder
-var klarkPlugins = `node_modules/klark-plugins/plugins/**/*.js`;
+var klarkPlugins = `node_modules/klark-js-plugins/plugins/**/*.js`;
 
 klark.run({
   predicateFilePicker: function() {
@@ -91,8 +91,8 @@ var subModules = `plugins/**/*.module.js`;
 
 // locate only the necessary klark plugins inside the node_modules folder
 var klarkPlugins = [
-    `node_modules/klark-plugins/plugins/generators/create-user.module.js`,
-    `node_modules/klark-plugins/plugins/models/user/index.js`
+    `node_modules/klark-js-plugins/plugins/generators/create-user.module.js`,
+    `node_modules/klark-js-plugins/plugins/models/user/index.js`
   ];
 
 klark.run({
