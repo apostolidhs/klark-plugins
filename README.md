@@ -1,6 +1,6 @@
-# klark-plugins
+# klark plugins
 
-Plugin modules for KlarkJS
+Plugin modules for [KlarkJS](https://github.com/apostolidhs/klark-js)
 
 We are trying to create an ecosystem of utilities and functionalities that improve dramatically the automation of creating a robust API in NodeJS, ExpressJS and [KlarkJS](https://github.com/apostolidhs/klark-js).
 
@@ -54,6 +54,60 @@ The main architecture that came up when we integrate a NodeJS API is the followi
 Hopefully, express js is organized in [middlewares](http://expressjs.com/en/guide/using-middleware.html).
 We created a collection of middlewares and utilities in order to automate the CRUD functionality. The CRUD model is based on the Mongoose models.
 
+## Install plugins
+
+1) In the root project folder install klark-plugins
+
+> `npm install --save klark-plugins`
+
+2) Open the file that contains the Klark registration code.
+
+```javascript
+var modules = `plugins/**/index.js`;
+var subModules = `plugins/**/*.module.js`;
+
+// locate the klark plugins inside the node_modules folder
+var klarkPlugins = `node_modules/klark-plugins/plugins/**/*.js`;
+
+klark.run({
+  predicateFilePicker: function() {
+    return [
+      modules,
+      subModules,
+      klarkPlugins
+    ]
+  }
+});
+```
+
+**Notice**
+
+If you want to include a subset of the plugins, you should include only the corresponding internal dependencies.
+Let's assume that we only want to use the `generators/create-user.module.js`. Our configuration should look like this:
+
+```javascript
+var modules = `plugins/**/index.js`;
+var subModules = `plugins/**/*.module.js`;
+
+// locate only the necessary klark plugins inside the node_modules folder
+var klarkPlugins = [
+    `node_modules/klark-plugins/plugins/generators/create-user.module.js`,
+    `node_modules/klark-plugins/plugins/models/user/index.js`
+  ];
+
+klark.run({
+  predicateFilePicker: function() {
+    return [
+      modules,
+      subModules,
+      klarkPlugins
+    ]
+  }
+});
+
+```
+
+
 ## Example
 
 Considering the following mongoose model:
@@ -82,7 +136,7 @@ KlarkModule(module, 'createSimpleTodoApi', function(krkCrudGenerator) {
 #### Unauthorized creation
 
 **Request**
-```
+```json
 POST http://.../v1/todo
 {
   "content": "hi"
@@ -90,7 +144,7 @@ POST http://.../v1/todo
 ```
 
 **Response**
-```
+```json
 401
 {
   "code": 4001,
@@ -101,7 +155,7 @@ POST http://.../v1/todo
 #### Authorized creation, invalid arguments
 
 **Request**
-```
+```json
 HEADER Authorization: JWT ...
 POST http://.../v1/todo
 {
@@ -110,12 +164,13 @@ POST http://.../v1/todo
 ```
 
 **Response**
-```
+```json
 400
 {
   "code": 1003,
   "msg": "invalid params, 'content' length"
 }
+```
 
 ### Create a custom CRUD api
 
