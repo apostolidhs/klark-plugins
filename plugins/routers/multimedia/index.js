@@ -17,7 +17,7 @@ KlarkModule(module, 'krkRoutesMultimedia', function(
     register: register
   };
 
-  function register(app) {
+  function register(app, config) {
     if (!(app && config && config.apiUrlPrefix && config.apiUrl)) {
       throw new Error('Invalid arguments');
     }
@@ -29,15 +29,15 @@ KlarkModule(module, 'krkRoutesMultimedia', function(
     );
 
     app.post('/' + config.apiUrlPrefix + 'multimedia/upload', [
-      middlewarePermissions.check('USER'),
+      krkMiddlewarePermissions.check('USER'),
       upload.single('image'),
-      middlewareResponse.success
+      krkMiddlewareResponse.success
     ]);
 
     app.delete('/' + config.apiUrlPrefix + 'multimedia/upload/:imageName', [
-      middlewarePermissions.check('USER'),
+      krkMiddlewarePermissions.check('USER'),
       middlewareDeleteImageController,
-      middlewareResponse.success
+      krkMiddlewareResponse.success
     ]);
   }
 

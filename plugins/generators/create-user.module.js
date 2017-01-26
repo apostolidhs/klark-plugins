@@ -21,7 +21,7 @@ KlarkModule(module, 'krkGeneratorsCreateUser', function($mongoose, krkModelsUser
     });
     return user.save()
       .then(function(user) {
-        return modelsUser.verifyAccount('mockValidationToken');
+        return krkModelsUser.verifyAccount('mockValidationToken');
       })
       .then(function() {
         return user;

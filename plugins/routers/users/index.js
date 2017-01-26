@@ -8,6 +8,7 @@ KlarkModule(module, 'krkRoutesUsers', function(
   krkRoutersAuthorizeVerifyAccountEmailTmpl,
   krkParameterValidator,
   krkNotificationsEmail,
+  krkMiddlewareParameterValidator,
   krkMiddlewareResponse,
   krkMiddlewareCrudController,
   krkMiddlewarePermissions
@@ -17,13 +18,13 @@ KlarkModule(module, 'krkRoutesUsers', function(
     register: register
   };
 
-  function register(app) {
+  function register(app, config) {
     if (!(app && config && config.apiUrlPrefix)) {
       throw new Error('Invalid arguments');
     }
     app.get('/' + config.apiUrlPrefix + '/user', [
       krkMiddlewarePermissions.check('ADMIN'),
-      middlewarekrkParameterValidator.crud.retrieveAll(krkModelsUser),
+      krkMiddlewareParameterValidator.crud.retrieveAll(krkModelsUser),
       krkMiddlewareCrudController.retrieveAll(krkModelsUser),
       middlewareRetrieveAllSafetyController,
       krkMiddlewareResponse.success
@@ -31,7 +32,7 @@ KlarkModule(module, 'krkRoutesUsers', function(
 
     app.delete('/' + config.apiUrlPrefix + '/user/:id', [
       krkMiddlewarePermissions.check('ADMIN'),
-      middlewarekrkParameterValidator.crud.delete(),
+      krkMiddlewareParameterValidator.crud.delete(),
       krkMiddlewareCrudController.delete(),
       krkMiddlewareResponse.success
     ]);
