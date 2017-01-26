@@ -7,9 +7,9 @@ KlarkModule(module, 'krkMiddlewareResponse', function($_) {
   setOptions();
 
   return {
-    success,
-    fail,
-    setOptions
+    success: success,
+    fail: fail,
+    setOptions: setOptions
   };
 
   function success(req, res, next) {

@@ -15,15 +15,12 @@ KlarkModule(module, 'krkCrudGenerator', function(
   };
 
   function create(app, customOpts) {
-    if (!customOpts.apiUrlPrefix) {
-      throw new Error('invalid arguments');
-    }
-    var crudUrls = krkCrudGeneratorUrls(customOpts.apiUrlPrefix);
     var opts = $_.defaultsDeep(customOpts, getDefaultOptions());
     var model = opts.model;
-    if (!model) {
-      throw new Error('invalid model argument');
+    if (!model || !opts.apiUrlPrefix) {
+      throw new Error('invalid arguments');
     }
+    var crudUrls = krkCrudGeneratorUrls(opts.apiUrlPrefix);
 
     app.get(crudUrls.retrieve(model.modelName), [
       krkMiddlewarePermissions.check(opts.retrieve.permissions),
