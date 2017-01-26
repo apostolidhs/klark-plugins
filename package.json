@@ -1,6 +1,6 @@
 {
   "name": "klark-js-plugins",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Plugin modules for KlarkJS",
   "main": "index.js",
   "scripts": {
