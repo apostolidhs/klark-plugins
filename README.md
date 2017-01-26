@@ -6,10 +6,12 @@ We are trying to create an ecosystem of utilities and functionalities that impro
 
 <!-- MarkdownTOC depth=4 autolink=true bracket=round -->
 
+- [Install plugins](#install-plugins)
 - [Example](#example)
   - [Create a simple CRUD api](#create-a-simple-crud-api)
     - [Unauthorized creation](#unauthorized-creation)
     - [Authorized creation, invalid arguments](#authorized-creation-invalid-arguments)
+  - [Create a custom CRUD api](#create-a-custom-crud-api)
 - [Plugins](#plugins)
   - [krkCrudGenerator](#krkcrudgenerator)
   - [krkCrudGeneratorUrls](#krkcrudgeneratorurls)
