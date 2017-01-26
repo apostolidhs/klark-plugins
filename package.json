@@ -1,0 +1,23 @@
+{
+  "name": "klark-js-plugins",
+  "version": "1.0.0",
+  "description": "Plugin modules for KlarkJS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/apostolidhs/klark-plugins.git"
+  },
+  "keywords": [
+    "klarkjs",
+    "plugins"
+  ],
+  "author": "Ioannis Apostolidis <john.apoostolidi@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/apostolidhs/klark-plugins/issues"
+  },
+  "homepage": "https://github.com/apostolidhs/klark-plugins#readme"
+}
