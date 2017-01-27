@@ -26,7 +26,7 @@ KlarkModule(module, 'krkNotificationsEmail', function($_, $q, $nodemailer) {
         html: content // html body
     };
 
-    return $q.promisify(cb, function() {
+    return $q.promisify(function(cb) {
       return transporter.sendMail(mailOptions, cb);
     });
   }

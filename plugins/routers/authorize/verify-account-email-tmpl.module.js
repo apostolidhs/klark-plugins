@@ -6,7 +6,7 @@ KlarkModule(module, 'krkRoutersAuthorizeVerifyAccountEmailTmpl', function(config
     template: template
   };
 
-  function template(user, verifyAccountRoute) {
+  function template(config) {
     if (!(config && config.user && config.verifyAccountRoute && config.name && config.apiUrl)) {
       throw new Error('Invalid arguments');
     }

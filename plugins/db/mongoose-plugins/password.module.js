@@ -39,17 +39,18 @@ KlarkModule(module, 'krkDbMongoosePluginsPassword', function($_, $q, $bcrypt, kr
     }
 
     function comparePassword(password) {
+      var self = this;
       return $q.promisify(function(cb) {
-        return $bcrypt.compare(password, this.password, cb)
-          .then(function(isMatch) {
-            if (isMatch) {
-              return true;
-            }
-            throw new Error(false);
-          })
-          .catch(function(reason) {
-            return cb(reason);
-          });
+        $bcrypt.compare(password, self.password, cb)
+      })
+      .then(function(isMatch) {
+        if (isMatch) {
+          return true;
+        }
+        throw new Error(false);
+      })
+      .catch(function(reason) {
+        return cb(reason);
       });
     }
   }

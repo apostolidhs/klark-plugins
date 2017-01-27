@@ -20,7 +20,8 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
 
   function register(app, config) {
     if (!(app && config && config.apiUrlPrefix && config.appUrl
-      && config.EMAIL_SMTP && config.EMAIL_NAME && config.EMAIL_ADDRESS)) {
+      && config.EMAIL_SMTP && config.EMAIL_NAME && config.EMAIL_ADDRESS
+      && config.name && config.apiUrl)) {
       throw new Error('Invalid arguments');
     }
 
@@ -128,7 +129,12 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
             krkLogger.info('send mock verification email to ' + user.name);
             return user;
           }
-          var emailTemplate = krkRoutersAuthorizeVerifyAccountEmailTmpl.template(user, verifyAccountRoute);
+          var emailTemplate = krkRoutersAuthorizeVerifyAccountEmailTmpl.template({
+            verifyAccountRoute: verifyAccountRoute,
+            user: user,
+            name: config.name,
+            apiUrl: config.apiUrl
+          });
           return krkNotificationsEmail.send(emailTemplate, {
             EMAIL_SMTP: config.EMAIL_SMTP,
             EMAIL_NAME: config.EMAIL_NAME,
@@ -141,7 +147,7 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
             .then(function() { return user; });
         })
         .then(function(newUser) {
-          return dbMongooseBinders.create(krkModelsUser, newUser);
+          return krkDbMongooseBinders.create(krkModelsUser, newUser);
         })
         .catch(function(reason) {
           if (reason.code === 11000) {
@@ -190,7 +196,7 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
             return next(true);
           }
 
-          res.locals.redirect = config.APP_URL + '/#/?validated=' + updated._id + '?email=' + updated.email;
+          res.locals.redirect = config.appUrl + '/#/?validated=' + updated._id + '?email=' + updated.email;
           next();
         });
     }
