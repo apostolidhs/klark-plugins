@@ -1,6 +1,6 @@
 'use strict';
 
-KlarkModule(module, 'krkUtilitiesDate', function($_, $moment) {
+KlarkModule(module, 'krkUtilitiesDate', function(_, $moment) {
 
   var dateFormat = 'MM/DD/YYYY HH:mm:ss';
 

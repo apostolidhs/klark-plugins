@@ -1,6 +1,6 @@
 'use strict';
 
-KlarkModule(module, 'krkDbMongooseConnector', function($q, $mongoose, krkLogger) {
+KlarkModule(module, 'krkDbMongooseConnector', function(q, $mongoose, krkLogger) {
 
   var promiseOfConnection;
   decorateMongoosePromises();
@@ -11,7 +11,7 @@ KlarkModule(module, 'krkDbMongooseConnector', function($q, $mongoose, krkLogger)
   };
 
   function decorateMongoosePromises() {
-    $mongoose.Promise = $q.Promise;
+    $mongoose.Promise = q.Promise;
   }
 
   function connect(mongodbUrl) {
@@ -22,7 +22,7 @@ KlarkModule(module, 'krkDbMongooseConnector', function($q, $mongoose, krkLogger)
       return promiseOfConnection;
     }
 
-    var deffered = $q.defer();
+    var deffered = q.defer();
 
     $mongoose.connect(mongodbUrl);
     var db = $mongoose.connection;

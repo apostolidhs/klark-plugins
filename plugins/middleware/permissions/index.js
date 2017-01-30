@@ -1,7 +1,7 @@
 'use strict';
 
 KlarkModule(module, 'krkMiddlewarePermissions', function(
-  $_,
+  _,
   $passport,
   $jwtSimple,
   krkLogger,
@@ -18,7 +18,7 @@ KlarkModule(module, 'krkMiddlewarePermissions', function(
   };
 
   function check(permission) {
-    if ($_.indexOf(krkMiddlewarePermissionsRoles, permission) === -1) {
+    if (_.indexOf(krkMiddlewarePermissionsRoles, permission) === -1) {
       krkLogger.error(`unsupported permission (${permission})`);
     }
 
@@ -41,11 +41,11 @@ KlarkModule(module, 'krkMiddlewarePermissions', function(
         var token = getToken(req.headers);
         var decodedToken = decodeJWT(token);
 
-        if (!($_.isObject(decodedToken) && decodedToken.session && decodedToken.user)) {
+        if (!(_.isObject(decodedToken) && decodedToken.session && decodedToken.user)) {
           return unauthorized();
         }
 
-        if (decodedToken.session.expiresAt < $_.now()) {
+        if (decodedToken.session.expiresAt < _.now()) {
           return unauthorized();
         }
 
@@ -81,7 +81,7 @@ KlarkModule(module, 'krkMiddlewarePermissions', function(
     var tokenData = {
       user: user.getSafely(),
       session: {
-        expiresAt: $_.now() + options.expirationPeriod
+        expiresAt: _.now() + options.expirationPeriod
       }
     };
 

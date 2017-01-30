@@ -1,6 +1,6 @@
 'use strict';
 
-KlarkModule(module, 'krkMiddlewareParameterValidator', function($q, $_, krkParameterValidator) {
+KlarkModule(module, 'krkMiddlewareParameterValidator', function(q, _, krkParameterValidator) {
 
   var defaultPagination = {
     page: 1,
@@ -52,7 +52,7 @@ KlarkModule(module, 'krkMiddlewareParameterValidator', function($q, $_, krkParam
     });
 
     var filters = {};
-    var partialValidations = $_.map(pathnames, function(pathname) {
+    var partialValidations = _.map(pathnames, function(pathname) {
       return {
         path: pathname,
         value: req.query[pathname],
@@ -101,7 +101,7 @@ KlarkModule(module, 'krkMiddlewareParameterValidator', function($q, $_, krkParam
 
   function paginationValidator(req) {
     var validators = krkParameterValidator.partialValidations(req);
-    var pagination = $_.defaults({
+    var pagination = _.defaults({
       page: validators.queryPage(),
       count: validators.queryCount(),
       sortBy: validators.querySortBy(),

@@ -1,7 +1,7 @@
 'use strict';
 
 KlarkModule(module, 'krkMiddlewarePermissionsAuthorizeStrategy', function(
-  $_,
+  _,
   $passportJwt,
   krkModelsUser
 ) {

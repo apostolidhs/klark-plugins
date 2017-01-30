@@ -1,7 +1,7 @@
 'use strict';
 
 KlarkModule(module, 'krkCrudGenerator', function(
-  $_,
+  _,
   krkMiddlewareParameterValidator,
   krkMiddlewarePermissions,
   krkMiddlewareCrudController,
@@ -15,7 +15,7 @@ KlarkModule(module, 'krkCrudGenerator', function(
   };
 
   function create(app, customOpts) {
-    var opts = $_.defaultsDeep(customOpts, getDefaultOptions());
+    var opts = _.defaultsDeep(customOpts, getDefaultOptions());
     var model = opts.model;
     if (!model || !opts.apiUrlPrefix) {
       throw new Error('invalid arguments');
@@ -68,7 +68,7 @@ KlarkModule(module, 'krkCrudGenerator', function(
       throw new Error('invalid arguments');
     }
     var crudUrls = krkCrudGeneratorUrls(customOpts.apiUrlPrefix);
-    var opts = $_.defaultsDeep(customOpts, getDefaultOptions());
+    var opts = _.defaultsDeep(customOpts, getDefaultOptions());
     var model = opts.model;
     if (!model) {
       throw new Error('invalid model argument');

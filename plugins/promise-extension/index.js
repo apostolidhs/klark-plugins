@@ -1,6 +1,6 @@
 'use strict';
 
-KlarkModule(module, 'krkPromiseExtension', function($_) {
+KlarkModule(module, 'krkPromiseExtension', function(_) {
 
   return {
     extend
@@ -35,10 +35,10 @@ KlarkModule(module, 'krkPromiseExtension', function($_) {
         throw new Error('invalid arguments');
       }
 
-      $_.defaultsDeep(opts, getDefaultValues());
+      _.defaultsDeep(opts, getDefaultValues());
 
       var deferred = q.defer();
-      var chunks = $_.chunk(opts.list, opts.slices);
+      var chunks = _.chunk(opts.list, opts.slices);
       var chunksLen = chunks.length;
       var result = [];
 
@@ -51,7 +51,7 @@ KlarkModule(module, 'krkPromiseExtension', function($_) {
           return deferred.resolve(result);
         }
         var chunk = chunks[sliceIdx];
-        var promisesOfChuck = $_.map(chunk, function(item) {
+        var promisesOfChuck = _.map(chunk, function(item) {
           return opts.promiseTransformator(item, listIdx++);
         });
         var promisesOfChuckResolver = q[opts.policy](promisesOfChuck);
@@ -60,7 +60,7 @@ KlarkModule(module, 'krkPromiseExtension', function($_) {
             return result = result.concat(resolvedChucks);
           })
           .then(function() {
-            return $_.delay(function() {
+            return _.delay(function() {
               return innerThrottledResolve(++sliceIdx, listIdx);
             }, opts.timeout);
           })

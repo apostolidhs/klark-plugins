@@ -1,8 +1,8 @@
 'use strict';
 
 KlarkModule(module, 'krkModelsUser', function(
-  $_,
-  $q,
+  _,
+  q,
   $mongoose,
   $mongooseTypeEmail,
   $mongooseCreatedmodified,
@@ -36,7 +36,7 @@ KlarkModule(module, 'krkModelsUser', function(
 
   function getSafely() {
     var userObj = this.toObject();
-    var safeUser = $_.omit(userObj, [
+    var safeUser = _.omit(userObj, [
       'password',
       'validationToken'
     ]);

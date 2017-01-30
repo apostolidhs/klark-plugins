@@ -3,8 +3,8 @@
 // TODO: more generic
 
 KlarkModule(module, 'krkRoutesMultimedia', function(
-  $q,
-  $_,
+  q,
+  _,
   $fs,
   $multer,
   $crypto,
@@ -46,7 +46,7 @@ KlarkModule(module, 'krkRoutesMultimedia', function(
       if (!filepath) {
         return res.status(404).end();
       }
-      $q.promisify(function(cb) {
+      q.promisify(function(cb) {
           return $fs.unlink(filepath.path, cb);
         })
         .catch(function() {
@@ -63,7 +63,7 @@ KlarkModule(module, 'krkRoutesMultimedia', function(
       if (!filepath) {
         return res.status(404).end();
       }
-      $q.promisify(function(cb) {
+      q.promisify(function(cb) {
           return $fs.readFile(filepath.path, cb);
         })
         .then(function(img) {
@@ -76,7 +76,7 @@ KlarkModule(module, 'krkRoutesMultimedia', function(
     }
 
     function getImagePath(imageName) {
-      var imageParts = $_.split(imageName, '_');
+      var imageParts = _.split(imageName, '_');
       if (imageParts.length !== 3) {
         return;
       }
@@ -121,7 +121,7 @@ KlarkModule(module, 'krkRoutesMultimedia', function(
             var hashedUserId = userId.substring(userId.length - 8);
             req.res.locals.params.hashedUserId = hashedUserId;
             var dir = 'uploads/applications/' + hashedUserId;
-            $q.promisify(function(cb) {
+            q.promisify(function(cb) {
                 return $mkdirp(dir, cb);
               })
               .catch(function(reason) {
@@ -133,9 +133,9 @@ KlarkModule(module, 'krkRoutesMultimedia', function(
               })
           },
           filename: function (req, file, next) {
-            var timestamp = $_.now();
+            var timestamp = _.now();
             var format = file.mimetype.substring(file.mimetype.lastIndexOf('/') + 1);
-            $q.promisify(function(cb) {
+            q.promisify(function(cb) {
                 return $crypto.randomBytes(16, cb);
               })
               .catch(function(reason) {

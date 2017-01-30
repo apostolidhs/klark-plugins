@@ -1,6 +1,6 @@
 'use strict';
 
-KlarkModule(module, 'krkDbMongooseBinders', function($_, $mongoose, krkLogger, krkModelsApp) {
+KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger, krkModelsApp) {
 
   return {
     create: create,
@@ -15,7 +15,7 @@ KlarkModule(module, 'krkDbMongooseBinders', function($_, $mongoose, krkLogger, k
   };
 
   function getAppInfo() {
-    return find(krkModelsApp).then($_.first);
+    return find(krkModelsApp).then(_.first);
   }
 
   function updateAppInfo(data) {
@@ -44,8 +44,8 @@ KlarkModule(module, 'krkDbMongooseBinders', function($_, $mongoose, krkLogger, k
 
     var q;
     if (filters) {
-      q = $_.transform(filters, function(result, value, key) {
-        if (!($_.isNil(value) || ($_.isString(value) && !value))) {
+      q = _.transform(filters, function(result, value, key) {
+        if (!(_.isNil(value) || (_.isString(value) && !value))) {
           result[key] = valueToFilter(value);
         }
       }, {});
@@ -60,7 +60,7 @@ KlarkModule(module, 'krkDbMongooseBinders', function($_, $mongoose, krkLogger, k
           .limit(pagination.count);
       }
       if (pagination.sortBy) {
-        cursor.sort($_.fromPairs([[pagination.sortBy, pagination.asc ? 1 : -1]]));
+        cursor.sort(_.fromPairs([[pagination.sortBy, pagination.asc ? 1 : -1]]));
       }
     }
 
@@ -76,11 +76,11 @@ KlarkModule(module, 'krkDbMongooseBinders', function($_, $mongoose, krkLogger, k
   }
 
   function valueToFilter(value) {
-    if ($_.isString(value)) {
+    if (_.isString(value)) {
       return new RegExp(value, "i");
-    } else if ($_.isNumber(value) || $_.isBoolean(value)) {
+    } else if (_.isNumber(value) || _.isBoolean(value)) {
       return value;
-    } else if ($_.isDate(value)) {
+    } else if (_.isDate(value)) {
       return {
         $lte: new Date(value.getTime() + 7 * 24 * 60 * 60 * 1000), // 1 week range
         $gte: value

@@ -2,8 +2,8 @@
 
 KlarkModule(module, 'krkRoutesUsers', function(
   $crypto,
-  $q,
-  $_,
+  q,
+  _,
   krkModelsUser,
   krkRoutersAuthorizeVerifyAccountEmailTmpl,
   krkParameterValidator,
@@ -53,7 +53,7 @@ KlarkModule(module, 'krkRoutesUsers', function(
         'oldPassword',
         'role'
       ];
-      var promiseOfValidations = $_.chain(possibleValues)
+      var promiseOfValidations = _.chain(possibleValues)
         .filter(function(name) {
           return req.body[name];
         })
@@ -68,13 +68,13 @@ KlarkModule(module, 'krkRoutesUsers', function(
         })
         .value();
 
-      $q.allSettled(promiseOfValidations)
+      q.allSettled(promiseOfValidations)
       .then(function(validationsResults) {
-        var validations = $_.groupBy(validationsResults, function(validationsResult) {
+        var validations = _.groupBy(validationsResults, function(validationsResult) {
           return validationsResult.state === 'fulfilled' ? 'fulfilled' : 'error';
         });
-        if (!$_.isEmpty(validations.error)) {
-          $_.each(validations.error, function(invalid) {
+        if (!_.isEmpty(validations.error)) {
+          _.each(validations.error, function(invalid) {
             return res.locals.errors.add('INVALID_PARAMS', invalid.reason);
           });
           return next(true);
@@ -88,7 +88,7 @@ KlarkModule(module, 'krkRoutesUsers', function(
     }
 
     function middlewareRetrieveAllSafetyController(req, res, next) {
-      res.locals.data.content = $_.map(res.locals.data.content, function(c) {
+      res.locals.data.content = _.map(res.locals.data.content, function(c) {
         return c.getSafely();
       });
       next();
@@ -105,23 +105,23 @@ KlarkModule(module, 'krkRoutesUsers', function(
       .then(function(user) {
         var jobPromises = [];
 
-        if ($_.find(fulfilled, function(v) { return v.value === 'newPassword'; })) {
+        if (_.find(fulfilled, function(v) { return v.value === 'newPassword'; })) {
           jobPromises.push(checkPassword(res, user));
         }
 
-        if ($_.find(fulfilled, function(v) { return v.value === 'email'; })) {
+        if (_.find(fulfilled, function(v) { return v.value === 'email'; })) {
           jobPromises.push(checkEmail(res, user));
         }
 
-        if ($_.find(fulfilled, function(v) { return v.value === 'name'; })) {
+        if (_.find(fulfilled, function(v) { return v.value === 'name'; })) {
           user.name = res.locals.params.name;
         }
 
-        if ($_.find(fulfilled, function(v) { return v.value === 'phone'; })) {
+        if (_.find(fulfilled, function(v) { return v.value === 'phone'; })) {
           user.phone = res.locals.params.phone;
         }
 
-        if ($_.find(fulfilled, function(v) { return v.value === 'role'; })) {
+        if (_.find(fulfilled, function(v) { return v.value === 'role'; })) {
           if (res.locals.user.role !== 'ADMIN') {
             res.locals.errors.add('INVALID_PARAMS', 'Not admin user');
             return next(true);
@@ -129,7 +129,7 @@ KlarkModule(module, 'krkRoutesUsers', function(
           user.role = res.locals.params.role;
         }
 
-        $q.all(jobPromises)
+        q.all(jobPromises)
           .then(function() {
             if(res.locals.errors.isEmpty()) {
               return user.save()
@@ -151,7 +151,7 @@ KlarkModule(module, 'krkRoutesUsers', function(
     }
 
     function checkEmail(res, user) {
-      return $q.promisify(function(cb) {
+      return q.promisify(function(cb) {
         return $crypto.randomBytes(32, cb); })
           .catch(function(reason) {
             res.locals.errors.add('NOT_ENOUGH_ENTROPY', reason);
@@ -183,11 +183,11 @@ KlarkModule(module, 'krkRoutesUsers', function(
     function checkPassword(res, user) {
       if (res.locals.user.role === 'ADMIN') {
         user.password = res.locals.params.newPassword;
-        return $q.when();
+        return q.when();
       }
       if (!res.locals.params.oldPassword) {
         res.locals.errors.add('INVALID_PARAMS', 'invalid-password')
-        return $q.when();
+        return q.when();
       }
 
       return user.comparePassword(res.locals.params.oldPassword)

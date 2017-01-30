@@ -1,13 +1,13 @@
 'use strict';
 
-KlarkModule(module, 'krkDbMongoosePluginsPassword', function($_, $q, $bcrypt, krkLogger) {
+KlarkModule(module, 'krkDbMongoosePluginsPassword', function(_, q, $bcrypt, krkLogger) {
 
   return passwordPlugin;
 
   function passwordPlugin(schema, options) {
 
     var passField = options.passwordField;
-    krkLogger.assert($_.isString(passField));
+    krkLogger.assert(_.isString(passField));
 
     schema.pre('save', encryptPassword);
     schema.methods.comparePassword = comparePassword;
@@ -19,11 +19,11 @@ KlarkModule(module, 'krkDbMongoosePluginsPassword', function($_, $q, $bcrypt, kr
         return next();
       }
 
-      $q.promisify(function(cb) {
+      q.promisify(function(cb) {
         return $bcrypt.genSalt(10, cb);
       })
       .then(function(salt) {
-        return $q.promisify(function(cb) {
+        return q.promisify(function(cb) {
           return $bcrypt.hash(user.password, salt, cb);
         });
       })
@@ -40,7 +40,7 @@ KlarkModule(module, 'krkDbMongoosePluginsPassword', function($_, $q, $bcrypt, kr
 
     function comparePassword(password) {
       var self = this;
-      return $q.promisify(function(cb) {
+      return q.promisify(function(cb) {
         $bcrypt.compare(password, self.password, cb)
       })
       .then(function(isMatch) {

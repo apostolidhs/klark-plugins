@@ -1,6 +1,6 @@
 'use strict';
 
-KlarkModule(module, 'krkMiddlewareResponse', function($_) {
+KlarkModule(module, 'krkMiddlewareResponse', function(_) {
 
   var options;
 
@@ -40,7 +40,7 @@ KlarkModule(module, 'krkMiddlewareResponse', function($_) {
 
   function response(res) {
     var meta = res.locals.meta;
-    meta.process = $_.now() - meta.process;
+    meta.process = _.now() - meta.process;
     var errors = res.locals.errors;
     return res.json({
       meta,
@@ -50,7 +50,7 @@ KlarkModule(module, 'krkMiddlewareResponse', function($_) {
   }
 
   function setOptions(customOptions) {
-    options = $_.assignIn({
+    options = _.assignIn({
       showStackError: true
     }, customOptions);
   }

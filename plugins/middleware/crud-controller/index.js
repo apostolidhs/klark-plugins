@@ -1,6 +1,6 @@
 'use strict';
 
-KlarkModule(module, 'krkMiddlewareCrudController', function($_, $q, krkDbMongooseBinders) {
+KlarkModule(module, 'krkMiddlewareCrudController', function(_, q, krkDbMongooseBinders) {
 
   return {
     create: createCtrl,
@@ -48,7 +48,7 @@ KlarkModule(module, 'krkMiddlewareCrudController', function($_, $q, krkDbMongoos
         filters: res.locals.params.filters
       };
 
-      $q.all([
+      q.all([
         krkDbMongooseBinders.find(model, findOpts),
         krkDbMongooseBinders.count(model)
       ])
@@ -81,7 +81,7 @@ KlarkModule(module, 'krkMiddlewareCrudController', function($_, $q, krkDbMongoos
       performAndResponse(function() {
         return krkDbMongooseBinders
           .find(model)
-          .then($_.first);
+          .then(_.first);
       }, res, next);
     };
   }
@@ -92,7 +92,7 @@ KlarkModule(module, 'krkMiddlewareCrudController', function($_, $q, krkDbMongoos
       performAndResponse(function() {
         return krkDbMongooseBinders
           .find(model)
-          .then($_.first)
+          .then(_.first)
           .then((record) => krkDbMongooseBinders.findByIdAndUpdate(model, record._id, updatedRecord));
       }, res, next);
     };

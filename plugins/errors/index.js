@@ -1,13 +1,13 @@
 'use strict';
 
-KlarkModule(module, 'krkErrors', ($_, krkLogger) => {
+KlarkModule(module, 'krkErrors', (_, krkLogger) => {
 
   return {
     build
   };
 
   function build(customErrorsDescr) {
-    const errorsDescr = $_.assignIn(getDefaultErrorsDescr(), customErrorsDescr);
+    const errorsDescr = _.assignIn(getDefaultErrorsDescr(), customErrorsDescr);
     const errors = [];
 
     return {
@@ -27,7 +27,7 @@ KlarkModule(module, 'krkErrors', ($_, krkLogger) => {
 
       errors.push({
         code: errorDescr[0],
-        msg: $_.isError(msg) ? {
+        msg: _.isError(msg) ? {
           msg: msg.message,
           stack: msg.stack
         } : msg

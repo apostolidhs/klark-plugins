@@ -1,8 +1,8 @@
 'use strict';
 
 KlarkModule(module, 'krkRoutesAuthorize', function(
-  $_,
-  $q,
+  _,
+  q,
   $crypto,
   krkLogger,
   krkDbMongooseBinders,
@@ -107,7 +107,7 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
     }
 
     function middlewareSignUpController(req, res, next) {
-      $q.promisify(function(cb) { return $crypto.randomBytes(32, cb); })
+      q.promisify(function(cb) { return $crypto.randomBytes(32, cb); })
           .catch(function(reason) {
             res.locals.errors.add('NOT_ENOUGH_ENTROPY', reason);
             next(true);

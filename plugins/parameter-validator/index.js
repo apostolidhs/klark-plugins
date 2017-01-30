@@ -1,6 +1,6 @@
 'use strict';
 
-KlarkModule(module, 'krkParameterValidator', ($q, $_, $expressValidator) => {
+KlarkModule(module, 'krkParameterValidator', (q, _, $expressValidator) => {
 
   return {
     validations: getValidations(),
@@ -40,7 +40,7 @@ KlarkModule(module, 'krkParameterValidator', ($q, $_, $expressValidator) => {
       },
       queryAsc: function(req) {
         req = rootReq || req;
-        return $_.has(req.query, 'asc') && req.query.asc !== 'false';
+        return _.has(req.query, 'asc') && req.query.asc !== 'false';
       }
     };
   }
@@ -69,15 +69,15 @@ KlarkModule(module, 'krkParameterValidator', ($q, $_, $expressValidator) => {
 
   // {path: 'v', value: v, isValid: v => v = v},
   function modelPartialValidator(model, opts) {
-    var errors = $_.chain(opts)
+    var errors = _.chain(opts)
       .map(function(opt) {
         var path = model.schema.path(opt.path);
 
-        if ($_.isEmpty(opt.value) && !path.isRequired) {
+        if (_.isEmpty(opt.value) && !path.isRequired) {
           return;
         }
 
-        var isInvalid = $_.find(path.validators, function(validatorModel) {
+        var isInvalid = _.find(path.validators, function(validatorModel) {
           return !validatorModel.validator(opt.value);
         });
 
@@ -90,10 +90,10 @@ KlarkModule(module, 'krkParameterValidator', ($q, $_, $expressValidator) => {
       .compact()
       .value();
 
-    if ($_.isEmpty(errors)) {
-      return $q.when(true);
+    if (_.isEmpty(errors)) {
+      return q.when(true);
     } else {
-      return $q.reject(errors);
+      return q.reject(errors);
     }
   }
 
