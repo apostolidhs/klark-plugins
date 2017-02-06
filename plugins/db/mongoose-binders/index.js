@@ -1,6 +1,6 @@
 'use strict';
 
-KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger, krkModelsApp) {
+KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger) {
 
   return {
     create: create,
@@ -8,22 +8,10 @@ KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger, kr
     findById: findById,
     find: find,
     count: count,
-    remove: remove,
-
-    getAppInfo: getAppInfo,
-    updateAppInfo: updateAppInfo
+    remove: remove
   };
 
-  function getAppInfo() {
-    return find(krkModelsApp).then(_.first);
-  }
 
-  function updateAppInfo(data) {
-    return getAppInfo()
-            .then(function(appInfo) {
-              return findByIdAndUpdate(krkModelsApp, appInfo._id, data);
-            });
-  }
 
   function create(model, record) {
     return model.create(record);

@@ -22,7 +22,8 @@ KlarkModule(module, 'krkModelsUser', function(
     validationToken: {type: String, maxlength: [64]},
     totalLogins: {type: Number, required: true, min: 0, default: 0},
     role: {type: String, enum: krkMiddlewarePermissionsRoles, required: true},
-    validatedByAdmin: {type: Boolean, required: true}
+    validatedByAdmin: {type: Boolean, required: true},
+    preferences: {type: $mongoose.Schema.Types.Mixed}
   });
 
   schema.plugin(krkDbMongoosePluginsPassword, { passwordField: 'password' });

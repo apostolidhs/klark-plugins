@@ -29,11 +29,11 @@ KlarkModule(module, 'krkMiddlewarePermissions', function(
     }
 
     return function(req, res, next) {
-      var options = {
+      var authOptions = {
         session: false,
         failWithError: true
       };
-      $passport.authenticate('jwt', options)(req, res, onPassportAuthenticationFinished);
+      $passport.authenticate('jwt', authOptions)(req, res, onPassportAuthenticationFinished);
 
       function onPassportAuthenticationFinished(error) {
         if (error) return unauthorized();

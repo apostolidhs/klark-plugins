@@ -11,7 +11,7 @@ KlarkModule(module, 'krkMiddlewareInitiateResponseParams', function(_, krkLogger
         krkLogger.error('krkMiddlewareInitiateResponseParams should be called as a middleware function');
       }
 
-      res.locals.errors = krkErrors.build();
+      res.locals.errors = krkErrors.build(config.errors);
       res.locals.data = undefined;
       res.locals.params = {};
       res.locals.meta = {

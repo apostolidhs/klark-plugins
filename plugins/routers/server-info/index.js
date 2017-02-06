@@ -14,14 +14,14 @@ KlarkModule(module, 'krkRoutesServerInfo', function(krkMiddlewareResponse) {
       serverInfoRouter,
       krkMiddlewareResponse.success
     ]);
-  }
 
-  function serverInfoRouter(req, res, next) {
-    var info = {
-      'currentVersion': config.apiVersion
-    };
-    res.locals.data = info;
+    function serverInfoRouter(req, res, next) {
+      var info = {
+        'currentVersion': config.apiVersion
+      };
+      res.locals.data = info;
 
-    next();
+      next();
+    }
   }
 });
