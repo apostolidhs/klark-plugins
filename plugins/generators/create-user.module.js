@@ -3,10 +3,19 @@
 KlarkModule(module, 'krkGeneratorsCreateUser', function($mongoose, krkModelsUser) {
 
   return {
-    admin: admin
+    admin: admin,
+    simple: simple
   };
 
-  function admin(userCred) {
+  function simple(userOpts) {
+    return createUser('USER', userOpts);
+  }
+
+  function admin(userOpts) {
+    return createUser('ADMIN', userOpts);
+  }
+
+  function createUser(role, userCred) {
     if (!(userCred.name && userCred.email && userCred.password)) {
       throw new Error('Invalid arguments');
     }
@@ -14,7 +23,7 @@ KlarkModule(module, 'krkGeneratorsCreateUser', function($mongoose, krkModelsUser
       name: userCred.name,
       email: userCred.email,
       password: userCred.password,
-      role: 'ADMIN',
+      role,
       preferences: {},
       validationToken: 'mockValidationToken',
       validatedByAdmin: true

@@ -5,7 +5,6 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
   q,
   $crypto,
   krkLogger,
-  krkDbMongooseBinders,
   krkRoutersAuthorizeVerifyAccountEmailTmpl,
   krkNotificationsEmail,
   krkMiddlewareResponse,
@@ -19,11 +18,19 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
   };
 
   function register(app, config) {
-    if (!(app && config && config.apiUrlPrefix && config.appUrl
-      && config.EMAIL_SMTP && config.EMAIL_NAME && config.EMAIL_ADDRESS
-      && config.name && config.apiUrl)) {
+    if (!(app
+      && config
+      && config.apiUrlPrefix
+      && config.appUrl
+      && config.apiUrl
+      && config.EMAIL_SMTP
+      && config.EMAIL_NAME
+      && config.EMAIL_ADDRESS
+      && config.name)) {
       throw new Error('Invalid arguments');
     }
+
+    config.adminValidationOnSignup = config.adminValidationOnSignup || true;
 
     app.post('/' + config.apiUrlPrefix + '/authorize/signup', [
       krkMiddlewarePermissions.check('FREE'),
@@ -39,12 +46,14 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
       krkMiddlewareResponse.success
     ]);
 
-    app.post('/' + config.apiUrlPrefix + '/authorize/verifyByAdmin/:id', [
-      krkMiddlewarePermissions.check('ADMIN'),
-      middlewareVerifyByAdminParameterValidator,
-      middlewareVerifyByAdminController,
-      krkMiddlewareResponse.success
-    ]);
+    if (config.adminValidationOnSignup) {
+      app.post('/' + config.apiUrlPrefix + '/authorize/verifyByAdmin/:id', [
+        krkMiddlewarePermissions.check('ADMIN'),
+        middlewareVerifyByAdminParameterValidator,
+        middlewareVerifyByAdminController,
+        krkMiddlewareResponse.success
+      ]);
+    }
 
     var verifyAccountRoute = '/' + config.apiUrlPrefix + '/authorize/verifyAccount';
     app.get(verifyAccountRoute, [
@@ -119,7 +128,7 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
             name: res.locals.params.name,
             password: res.locals.params.password,
             phone: res.locals.params.phone,
-            validatedByAdmin: false,
+            validatedByAdmin: config.adminValidationOnSignup,
             role: 'USER',
             preferences: {}
           });
@@ -147,7 +156,7 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
             .then(function() { return user; });
         })
         .then(function(newUser) {
-          return krkDbMongooseBinders.create(krkModelsUser, newUser);
+          return newUser.save();
         })
         .catch(function(reason) {
           if (reason.code === 11000) {

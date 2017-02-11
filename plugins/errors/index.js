@@ -11,10 +11,10 @@ KlarkModule(module, 'krkErrors', (_, krkLogger) => {
     const errors = [];
 
     return {
-      add,
-      commit,
-      isEmpty,
-      isUnauthorized
+      add: add,
+      commit: commit,
+      isEmpty: isEmpty,
+      isUnauthorized: isUnauthorized
     };
 
     function add(errorId, msg) {

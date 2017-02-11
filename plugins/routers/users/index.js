@@ -7,6 +7,7 @@ KlarkModule(module, 'krkRoutesUsers', function(
   krkModelsUser,
   krkRoutersAuthorizeVerifyAccountEmailTmpl,
   krkParameterValidator,
+  krkCrudGenerator,
   krkNotificationsEmail,
   krkMiddlewareParameterValidator,
   krkMiddlewareResponse,
@@ -22,23 +23,15 @@ KlarkModule(module, 'krkRoutesUsers', function(
     if (!(app && config && config.apiUrl && config.apiUrlPrefix && config.name)) {
       throw new Error('Invalid arguments');
     }
-    app.get('/' + config.apiUrlPrefix + '/user', [
-      krkMiddlewarePermissions.check('ADMIN'),
-      krkMiddlewareParameterValidator.crud.retrieveAll(krkModelsUser),
-      krkMiddlewareCrudController.retrieveAll(krkModelsUser),
-      middlewareRetrieveAllSafetyController,
-      krkMiddlewareResponse.success
-    ]);
 
-    app.delete('/' + config.apiUrlPrefix + '/user/:id', [
-      krkMiddlewarePermissions.check('ADMIN'),
-      krkMiddlewareParameterValidator.crud.delete(),
-      krkMiddlewareCrudController.delete(),
-      krkMiddlewareResponse.success
-    ]);
+    const crudOpts = {
+      model: krkModelsUser,
+      apiUrlPrefix: config.apiUrlPrefix
+    };
+    krkCrudGenerator.create(app, crudOpts);
 
     app.patch('/' + config.apiUrlPrefix + '/user/:id', [
-      krkMiddlewarePermissions.check('USER'),
+      krkMiddlewarePermissions.check('USER', {onlyOwner: true}),
       middlewareUpdateParameterValidator,
       middlewareUpdateController,
       krkMiddlewareResponse.success

@@ -5,7 +5,8 @@ KlarkModule(module, 'krkMiddlewarePermissions', function(
   $passport,
   $jwtSimple,
   krkLogger,
-  krkMiddlewarePermissionsRoles
+  krkMiddlewarePermissionsRoles,
+  krkParameterValidator
 ) {
 
   var options;
@@ -17,7 +18,10 @@ KlarkModule(module, 'krkMiddlewarePermissions', function(
     setOptions: setOptions
   };
 
-  function check(permission) {
+  function check(permission, _permOpts) {
+    const permOpts = _.defaultsDeep(_permOpts, {
+      onlyOwner: false
+    });
     if (_.indexOf(krkMiddlewarePermissionsRoles, permission) === -1) {
       krkLogger.error(`unsupported permission (${permission})`);
     }
@@ -51,10 +55,16 @@ KlarkModule(module, 'krkMiddlewarePermissions', function(
 
         var user = decodedToken.user;
 
-        if (!(user
-          && ((permission === 'USER' && (user.role === 'USER' || user.role === 'ADMIN'))
-          || permission === 'ADMIN' && (user.role === 'ADMIN')))) {
+        if (!((permission === 'USER' && (user.role === 'USER' || user.role === 'ADMIN'))
+          || permission === 'ADMIN' && (user.role === 'ADMIN'))) {
             return unauthorized();
+        }
+
+        if (permOpts.onlyOwner) {
+          const tarketUserIs = krkParameterValidator.validations.paramId(req);
+          if(user.role === 'USER' && user._id !== tarketUserIs) {
+            return unauthorized();
+          }
         }
 
         res.locals.user = decodedToken.user;

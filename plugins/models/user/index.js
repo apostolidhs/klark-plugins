@@ -14,7 +14,7 @@ KlarkModule(module, 'krkModelsUser', function(
 
   var schema = new $mongoose.Schema({
     name: {type: String, maxlength: [64], unique: true, required: true},
-    email: {type: $mongoose.SchemaTypes.Email, required: true, unique: true},
+    email: {type: $mongoose.SchemaTypes.Email, unique: true, required: true},
     password: {type: String, required: true},
     phone: {type: String, maxlength: [32]},
     lastLogin: {type: Date, required: true, default: Date.now},
