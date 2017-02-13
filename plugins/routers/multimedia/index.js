@@ -30,17 +30,28 @@ KlarkModule(module, 'krkRoutesMultimedia', function(
 
     app.post('/' + config.apiUrlPrefix + '/multimedia/upload', [
       krkMiddlewarePermissions.check('USER'),
-      upload.single('image'),
+      middlewareUploadFileController,
       krkMiddlewareResponse.success
     ]);
+
+    function middlewareUploadFileController(req, res, next) {
+      const uploadMiddleware = upload.single('image');
+      uploadMiddleware(req, res, error => {
+        if (error) {
+          res.locals.errors.add('INVALID_FILE_TYPE');
+          return next(true);
+        }
+        next();
+      });
+    }
 
     app.delete('/' + config.apiUrlPrefix + '/multimedia/upload/:imageName', [
       krkMiddlewarePermissions.check('USER'),
-      middlewareDeleteImageController,
+      middlewareDeleteFileController,
       krkMiddlewareResponse.success
     ]);
 
-    function middlewareDeleteImageController(req, res, next) {
+    function middlewareDeleteFileController(req, res, next) {
       var imageName = req.params.imageName;
       var filepath = getImagePath(imageName);
       if (!filepath) {
@@ -86,6 +97,8 @@ KlarkModule(module, 'krkRoutesMultimedia', function(
         contentType = 'image/png';
       } else if (format === 'jpeg') {
         contentType = 'image/jpeg';
+      } else if (format === 'pdf') {
+        contentType = 'application/pdf';
       } else {
         return;
       }
@@ -101,7 +114,7 @@ KlarkModule(module, 'krkRoutesMultimedia', function(
       return {
         storage: storage(),
         limits: {
-          fileSize: 0.6 * 1024 * 1024,
+          fileSize: 2 * 1024 * 1024,
           files: 1
         },
         fileFilter
@@ -109,9 +122,10 @@ KlarkModule(module, 'krkRoutesMultimedia', function(
 
       function fileFilter (req, file, next) {
         var accept = file.mimetype === 'image/png'
-          || file.mimetype === 'image/jpeg';
+          || file.mimetype === 'image/jpeg'
+          || file.mimetype === 'application/pdf';
 
-        next(null, accept);
+        next(accept ? null : new Error('Invalid type'), true);
       }
 
       function storage() {

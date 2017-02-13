@@ -60,7 +60,9 @@ KlarkModule(module, 'krkErrors', (_, krkLogger) => {
       NOT_VERIFIED_USER: [4002, 'user needs verification'],
       ALREADY_EXIST: [4003, 'some of the unique fields already exist'],
 
-      EMAIL_FAIL: [5001, 'fail to send email']
+      EMAIL_FAIL: [5001, 'fail to send email'],
+
+      INVALID_FILE_TYPE: [6001, 'invalid file type']
     };
   }
 });
