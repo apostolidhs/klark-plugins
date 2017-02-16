@@ -27,12 +27,11 @@ KlarkModule(module, 'krkRoutesUsers', function(
     const crudOpts = {
       model: krkModelsUser,
       apiUrlPrefix: config.apiUrlPrefix,
-      retrieveAll: {
-        onMiddlewareGenerated: function(middlewares) {
-          middlewares.splice(3, 0, middlewareRetrieveAllSafetyController);
-          return middlewares;
-        }
-      }
+      retrieve: safetyReturnUser(middlewareSingleSafetyController),
+      retrieveAll: safetyReturnUser(middlewareRetrieveAllSafetyController),
+      create: safetyReturnUser(middlewareSingleSafetyController),
+      update: safetyReturnUser(middlewareSingleSafetyController),
+      delete: safetyReturnUser(middlewareSingleSafetyController)
     };
     krkCrudGenerator.create(app, crudOpts);
 
@@ -87,10 +86,26 @@ KlarkModule(module, 'krkRoutesUsers', function(
     }
 
     function middlewareRetrieveAllSafetyController(req, res, next) {
-      res.locals.data.content = _.map(res.locals.data.content, function(c) {
-        return c.getSafely();
+      res.locals.data.content = _.map(res.locals.data.content, function(user) {
+        return user.getSafely();
       });
       next();
+    }
+
+    function middlewareSingleSafetyController(req, res, next) {
+      if (res.locals.data) {
+        res.locals.data = res.locals.data.getSafely();
+      }
+      next();
+    }
+
+    function safetyReturnUser(middlewareCtrl) {
+      return {
+        onMiddlewareGenerated: function(middlewares) {
+          middlewares.splice(3, 0, middlewareCtrl);
+          return middlewares;
+        }
+      }
     }
 
     function middlewareUpdateController(req, res, next) {
