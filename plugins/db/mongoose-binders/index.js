@@ -66,7 +66,7 @@ KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger) {
   function valueToFilter(value) {
     if (_.isString(value)) {
       return new RegExp(value, "i");
-    } else if (_.isNumber(value) || _.isBoolean(value)) {
+    } else if (_.isNumber(value) || _.isBoolean(value) || _.get(value, '_bsontype') === 'ObjectID') {
       return value;
     } else if (_.isDate(value)) {
       return {
