@@ -26,7 +26,13 @@ KlarkModule(module, 'krkRoutesUsers', function(
 
     const crudOpts = {
       model: krkModelsUser,
-      apiUrlPrefix: config.apiUrlPrefix
+      apiUrlPrefix: config.apiUrlPrefix,
+      retrieveAll: {
+        onMiddlewareGenerated: function(middlewares) {
+          middlewares.splice(3, 0, middlewareRetrieveAllSafetyController);
+          return middlewares;
+        }
+      }
     };
     krkCrudGenerator.create(app, crudOpts);
 

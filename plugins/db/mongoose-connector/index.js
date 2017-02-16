@@ -7,7 +7,8 @@ KlarkModule(module, 'krkDbMongooseConnector', function(q, $mongoose, krkLogger) 
 
   return {
     connect: connect,
-    dropDatabase: dropDatabase
+    dropDatabase: dropDatabase,
+    decorateMongoosePromises: decorateMongoosePromises
   };
 
   function decorateMongoosePromises() {
@@ -23,7 +24,7 @@ KlarkModule(module, 'krkDbMongooseConnector', function(q, $mongoose, krkLogger) 
     }
 
     var deffered = q.defer();
-
+    decorateMongoosePromises();
     $mongoose.connect(mongodbUrl);
     var db = $mongoose.connection;
     db.on('error', function(err) {

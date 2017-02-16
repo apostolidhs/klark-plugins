@@ -6,11 +6,13 @@ KlarkModule(module, 'krkModelsUser', function(
   $mongoose,
   $mongooseTypeEmail,
   $mongooseCreatedmodified,
+  krkDbMongooseConnector,
   krkMiddlewarePermissionsRoles,
   krkDbMongoosePluginsPassword
 ) {
   // seconds, after signup of the account, how long will the user remain until it will be validated
   var USER_ACCOUNT_VALIDATION_PERIOD = 1 * 24 * 60 * 60 * 1000;
+  krkDbMongooseConnector.decorateMongoosePromises();
 
   var schema = new $mongoose.Schema({
     name: {type: String, maxlength: [64], unique: true, required: true},

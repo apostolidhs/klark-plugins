@@ -22,45 +22,45 @@ KlarkModule(module, 'krkCrudGenerator', function(
     }
     var crudUrls = krkCrudGeneratorUrls(opts.apiUrlPrefix);
 
-    app.get(crudUrls.retrieve(model.modelName), [
+    app.get(crudUrls.retrieve(model.modelName), opts.retrieve.onMiddlewareGenerated([
       krkMiddlewarePermissions.check(opts.retrieve.permissions),
       krkMiddlewareParameterValidator.crud.retrieve(),
       krkMiddlewareCrudController.retrieve(model),
       krkMiddlewareResponse.success,
       krkMiddlewareResponse.fail
-    ]);
+    ]));
 
-    app.get(crudUrls.retrieveAll(model.modelName), [
+    app.get(crudUrls.retrieveAll(model.modelName), opts.retrieveAll.onMiddlewareGenerated([
       krkMiddlewarePermissions.check(opts.retrieveAll.permissions),
       krkMiddlewareParameterValidator.crud.retrieveAll(model),
       krkMiddlewareCrudController.retrieveAll(model),
       krkMiddlewareResponse.success,
       krkMiddlewareResponse.fail
-    ]);
+    ]));
 
-    app.post(crudUrls.create(model.modelName), [
+    app.post(crudUrls.create(model.modelName), opts.create.onMiddlewareGenerated([
       krkMiddlewarePermissions.check(opts.create.permissions),
       krkMiddlewareParameterValidator.crud.create(model),
       krkMiddlewareCrudController.create(model),
       krkMiddlewareResponse.success,
       krkMiddlewareResponse.fail
-    ]);
+    ]));
 
-    app.put(crudUrls.update(model.modelName), [
+    app.put(crudUrls.update(model.modelName), opts.update.onMiddlewareGenerated([
       krkMiddlewarePermissions.check(opts.update.permissions),
       krkMiddlewareParameterValidator.crud.update(model),
       krkMiddlewareCrudController.update(model),
       krkMiddlewareResponse.success,
       krkMiddlewareResponse.fail
-    ]);
+    ]));
 
-    app.delete(crudUrls.delete(model.modelName), [
+    app.delete(crudUrls.delete(model.modelName), opts.delete.onMiddlewareGenerated([
       krkMiddlewarePermissions.check(opts.delete.permissions),
       krkMiddlewareParameterValidator.crud.delete(model),
       krkMiddlewareCrudController.delete(model),
       krkMiddlewareResponse.success,
       krkMiddlewareResponse.fail
-    ]);
+    ]));
   }
 
   function createSingle(app, customOpts) {
@@ -96,19 +96,24 @@ KlarkModule(module, 'krkCrudGenerator', function(
   function getDefaultOptions() {
     return {
       retrieveAll: {
-        permissions: 'ADMIN'
+        permissions: 'ADMIN',
+        onMiddlewareGenerated: _.identity
       },
       retrieve: {
-        permissions: 'ADMIN'
+        permissions: 'ADMIN',
+        onMiddlewareGenerated: _.identity
       },
       create: {
-        permissions: 'ADMIN'
+        permissions: 'ADMIN',
+        onMiddlewareGenerated: _.identity
       },
       update: {
-        permissions: 'ADMIN'
+        permissions: 'ADMIN',
+        onMiddlewareGenerated: _.identity
       },
       delete: {
-        permissions: 'ADMIN'
+        permissions: 'ADMIN',
+        onMiddlewareGenerated: _.identity
       }
     };
   }
