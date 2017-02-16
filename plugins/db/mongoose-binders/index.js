@@ -11,8 +11,6 @@ KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger) {
     remove: remove
   };
 
-
-
   function create(model, record) {
     return model.create(record);
   }
@@ -33,7 +31,9 @@ KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger) {
     var q;
     if (filters) {
       q = _.transform(filters, function(result, value, key) {
-        if (!(_.isNil(value) || (_.isString(value) && !value))) {
+        if (key === '__custom__' && _.isFunction(value)) {
+          value(result);
+        } else if (!(_.isNil(value) || (_.isString(value) && !value))) {
           result[key] = valueToFilter(value);
         }
       }, {});
