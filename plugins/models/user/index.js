@@ -31,6 +31,7 @@ KlarkModule(module, 'krkModelsUser', function(
   schema.plugin(krkDbMongoosePluginsPassword, { passwordField: 'password' });
   schema.plugin($mongooseCreatedmodified.createdModifiedPlugin);
   schema.methods.getSafely = getSafely;
+  schema.methods.updateLoginInfo = updateLoginInfo;
   schema.statics.verifyAccount = verifyAccount;
   schema.statics.invalidateAccount = invalidateAccount;
   schema.statics.validateByAdmin = validateByAdmin;
@@ -49,6 +50,12 @@ KlarkModule(module, 'krkModelsUser', function(
     }
 
     return safeUser;
+  }
+
+  function updateLoginInfo() {
+    ++this.totalLogins;
+    this.lastLogin = new Date();
+    return this.save();
   }
 
   function invalidateAccount(id, validationToken) {
@@ -72,5 +79,4 @@ KlarkModule(module, 'krkModelsUser', function(
   function validateByAdmin(id) {
     return this.findOneAndUpdate({_id: id}, {validatedByAdmin: true}, {new: true});
   }
-
 });

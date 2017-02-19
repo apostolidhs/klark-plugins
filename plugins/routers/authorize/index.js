@@ -183,7 +183,7 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
           return user.comparePassword(req.body.password)
             .then(function(isEqual) {
               res.locals.data = krkMiddlewarePermissions.createJWT(user);
-
+              user.updateLoginInfo();
               next();
             })
             .catch(function(reason) {
