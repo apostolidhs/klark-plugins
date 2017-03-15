@@ -45,7 +45,8 @@ KlarkModule(module, 'krkMiddlewareCrudController', function(_, q, krkDbMongooseB
     return function(req, res, next) {
       var findOpts = {
         pagination: res.locals.params.pagination,
-        filters: res.locals.params.filters
+        filters: res.locals.params.filters,
+        uniqueBy: res.locals.params.uniqueBy
       };
 
       q.all([

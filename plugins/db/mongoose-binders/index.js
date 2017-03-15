@@ -27,6 +27,7 @@ KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger) {
   function find(model, opts) {
     var pagination = opts && opts.pagination;
     var filters = opts && opts.filters;
+    var uniqueBy = opts && opts.uniqueBy;
 
     var q;
     if (filters) {
@@ -40,6 +41,10 @@ KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger) {
     }
 
     var cursor = model.find(q);
+
+    if (uniqueBy) {
+      cursor.distinct(uniqueBy);
+    }
 
     if (pagination) {
       if (pagination.page) {
