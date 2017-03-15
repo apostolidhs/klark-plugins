@@ -41,7 +41,7 @@ KlarkModule(module, 'krkMiddlewareParameterValidator', function(q, _, krkParamet
           })
       });
     }
-  }
+  }//uniqueBy
 
   function checkPossibleModelQueryParameters(model, req, res) {
     var pathnames = [];
@@ -50,6 +50,10 @@ KlarkModule(module, 'krkMiddlewareParameterValidator', function(q, _, krkParamet
         pathnames.push(pathname);
       }
     });
+
+    if (req.query.uniqueBy) {
+
+    }
 
     var filters = {};
     var partialValidations = _.map(pathnames, function(pathname) {
