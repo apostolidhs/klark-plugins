@@ -52,7 +52,10 @@ KlarkModule(module, 'krkMiddlewareParameterValidator', function(q, _, krkParamet
     });
 
     if (req.query.uniqueBy) {
-
+      const indexOfUniqueKey = pathnames.indexOf(req.query.uniqueBy);
+      if (indexOfUniqueKey !== -1) {
+        res.locals.params.uniqueBy = req.query.uniqueBy;
+      }
     }
 
     var filters = {};
