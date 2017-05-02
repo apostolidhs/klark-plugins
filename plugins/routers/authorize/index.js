@@ -87,7 +87,8 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
         {path: 'name', value: req.body.name, onValidate: function(v) { return res.locals.params.name = v;}},
         {path: 'email', value: req.body.email, onValidate: function(v) { return res.locals.params.email = v;}},
         {path: 'password', value: req.body.password, onValidate: function(v) { return res.locals.params.password = v;}},
-        {path: 'phone', value: req.body.phone, onValidate: function(v) { return res.locals.params.phone = v;}}
+        {path: 'phone', value: req.body.phone, onValidate: function(v) { return res.locals.params.phone = v;}},
+        {path: 'preferences', value: req.body.preferences, onValidate: function(v) { return res.locals.params.preferences = v;}}
       ];
       krkParameterValidator.modelPartialValidator(krkModelsUser, validationOpts)
         .then(function() { return next(); })
@@ -130,7 +131,7 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
             phone: res.locals.params.phone,
             validatedByAdmin: config.adminValidationOnSignup,
             role: 'USER',
-            preferences: {}
+            preferences: res.locals.params.preferences
           });
         })
         .then(function(user) {

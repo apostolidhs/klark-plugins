@@ -24,7 +24,10 @@ KlarkModule(module, 'krkGeneratorsCreateUser', function($mongoose, krkModelsUser
       email: userCred.email,
       password: userCred.password,
       role,
-      preferences: {},
+      preferences: {
+        surname: 'admin',
+        firstname: 'admin'
+      },
       validationToken: 'mockValidationToken',
       validatedByAdmin: true
     });
