@@ -276,15 +276,10 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
             if (!user) {
               return next();
             }
+            let newPassword = $crypto.randomBytes(16).toString('hex');
             q.resolve()
-              .then(function() {
-                return {
-                  user: user,
-                  token: $crypto.randomBytes(8)
-                };
-              })
               .then(function(obj) {
-                obj.user.password = obj.token.toString('hex');
+                obj.user.password = newPassword;
                 return obj.user.save();
               })
               .catch(function(reason) {
@@ -294,7 +289,7 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
               .then(function(user) {
                 res.locals.data = user.getSafely();
                 var emailTemplate = krkRoutersAuthorizeResetPasswordEmailTmpl.template({
-                  password: user.password,
+                  password: newPassword,
                   user: user,
                   name: config.name,
                   appUrl: config.appUrl
