@@ -278,9 +278,9 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
             }
             let newPassword = $crypto.randomBytes(16).toString('hex');
             q.resolve()
-              .then(function(obj) {
-                obj.user.password = newPassword;
-                return obj.user.save();
+              .then(function() {
+                user.password = newPassword;
+                return user.save();
               })
               .catch(function(reason) {
                 res.locals.errors.add('DB_ERROR', reason.errors || reason);
