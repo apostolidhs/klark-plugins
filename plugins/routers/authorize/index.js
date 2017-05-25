@@ -277,13 +277,15 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
               return next();
             }
             q.resolve()
-              .then(() => ({
-                user,
-                token: $crypto.randomBytes(8)
-              }))
-              .then(function({user, token}) {
-                user.password = token.toString('hex');
-                return user.save();
+              .then(function() {
+                return {
+                  user: user,
+                  token: $crypto.randomBytes(8)
+                };
+              })
+              .then(function(obj) {
+                obj.user.password = obj.token.toString('hex');
+                return obj.user.save();
               })
               .catch(function(reason) {
                 res.locals.errors.add('DB_ERROR', reason.errors || reason);
