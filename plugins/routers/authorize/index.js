@@ -6,6 +6,7 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
   $crypto,
   krkLogger,
   krkRoutersAuthorizeVerifyAccountEmailTmpl,
+  krkRoutersAuthorizeResetPasswordEmailTmpl,
   krkNotificationsEmail,
   krkMiddlewareResponse,
   krkParameterValidator,
@@ -69,6 +70,13 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
       krkMiddlewareResponse.success
     ]);
 
+    app.post('/' + config.apiUrlPrefix + '/authorize/resetPassword', [
+      krkMiddlewarePermissions.check('FREE'),
+      middlewareResetPasswordValidator,
+      middlewareResetPasswordController,
+      krkMiddlewareResponse.success
+    ]);
+
     function middlewareVerifyAccountParameterValidator(req, res, next) {
       var validationOpts = [
         {path: 'validationToken', value: req.query.token, onValidate: v => res.locals.params.token = v}
@@ -114,6 +122,18 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
     function middlewareVerifyByAdminParameterValidator(req, res, next) {
       res.locals.params.id = krkParameterValidator.validations.paramId(req);
       krkParameterValidator.checkForErrors(res.locals.params, req, res, next);
+    }
+
+    function middlewareResetPasswordValidator(req, res, next) {
+      var validationOpts = [
+        {path: 'email', value: req.body.email, onValidate: v => res.locals.params.email = v}
+      ];
+      krkParameterValidator.modelPartialValidator(krkModelsUser, validationOpts)
+        .then(function() { return next(); })
+        .catch(function(reason) {
+          res.locals.errors.add('INVALID_PARAMS', reason);
+          next(true);
+        });
     }
 
     function middlewareSignUpController(req, res, next) {
@@ -244,6 +264,55 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
           res.locals.data = krkMiddlewarePermissions.createJWT(user);
           next();
         });
+    }
+
+    function middlewareResetPasswordController(req, res, next) {
+      krkModelsUser.findOne({email: res.locals.params.email})
+          .catch(function(reason) {
+            res.locals.errors.add('DB_ERROR', reason);
+            return next(true);
+          })
+          .then(user => {
+            if (!user) {
+              return next();
+            }
+            q.resolve()
+              .then(() => ({
+                user,
+                token: $crypto.randomBytes(8)
+              }))
+              .then(function({user, token}) {
+                user.password = token.toString('hex');
+                return user.save();
+              })
+              .catch(function(reason) {
+                res.locals.errors.add('DB_ERROR', reason.errors || reason);
+                next(true);
+              })
+              .then(function(user) {
+                res.locals.data = user.getSafely();
+                var emailTemplate = krkRoutersAuthorizeResetPasswordEmailTmpl.template({
+                  password: user.password,
+                  user: user,
+                  name: config.name,
+                  appUrl: config.appUrl
+                });
+                return krkNotificationsEmail.send(emailTemplate, {
+                  EMAIL_SMTP: config.EMAIL_SMTP,
+                  EMAIL_NAME: config.EMAIL_NAME,
+                  EMAIL_ADDRESS: config.EMAIL_ADDRESS
+                })
+                .catch(function(reason) {
+                  res.locals.errors.add('EMAIL_FAIL', reason.errors || reason);
+                  next(true);
+                });
+              })
+              .catch(function(reason) {
+                res.locals.errors.add('UNEXPECTED', reason.errors || reason);
+                next(true);
+              })
+              .then(function() { return next(); });
+          })
     }
   }
 
