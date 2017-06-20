@@ -14,10 +14,10 @@ KlarkModule(module, 'krkRoutersAuthorizeVerifyAccountEmailTmpl', function(config
 
     var verifyUrl = [config.apiUrl, config.verifyAccountRoute, '?token=', config.user.validationToken].join('');
     var content = '\
-      <h1>' + config.name + '</h1>\
-      <h3>Γειά σας ' + config.user.name + '</h3>\
-      <p>Δημιουργήσατε λογαριασμό σε εμάς</p>\
-      <p>Παρακαλώ, <a href="' + verifyUrl + '">πιστοποιήστε τον λογαριασμό σας</a></p>\
+      Κε/Κα ' + config.name + ',\
+      <p>Ευχαριστούμε για την εγγραφή σας στην εφαρμογή <strong>RFS-iSAFE WebApp!</strong><br>\
+      Παρακαλούμε πατήστε <a href="' + verifyUrl + '">εδώ</a> για να ολοκληρωθεί η εγγραφή σας.</p>\
+      Με εκτίμηση,    \
     ';
 
     return {
