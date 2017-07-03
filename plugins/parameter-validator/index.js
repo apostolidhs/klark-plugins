@@ -78,7 +78,13 @@ KlarkModule(module, 'krkParameterValidator', (q, _, $expressValidator) => {
         }
 
         var isInvalid = _.find(path.validators, function(validatorModel) {
-          return !validatorModel.validator(path.cast(opt.value));
+          if (validatorModel.type === 'enum') {
+            return false;
+          } else if (validatorModel.message === 'url is invalid') {
+            return false;
+          } else {
+            return !validatorModel.validator(path.cast(opt.value));
+          }
         });
 
         if (isInvalid) {
