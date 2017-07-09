@@ -10,7 +10,7 @@ KlarkModule(module, 'krkRoutersAuthorizeVerifyAccountEmailTmpl', function(config
     if (!(config && config.user && config.verifyAccountRoute && config.name && config.apiUrl)) {
       throw new Error('Invalid arguments');
     }
-    var subject = config.name + 'Πιστοποιήστε τον λογαριασμό σας';
+    var subject = config.name + ' Πιστοποιήστε τον λογαριασμό σας';
 
     var verifyUrl = [config.apiUrl, config.verifyAccountRoute, '?token=', config.user.validationToken].join('');
     var content = '\
