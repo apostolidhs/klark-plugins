@@ -8,7 +8,11 @@ KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger) {
     findById: findById,
     find: find,
     count: count,
-    remove: remove
+    remove: remove,
+    appliers: {
+      applyPagination,
+      applyFilters
+    }
   };
 
   function create(model, record) {
@@ -29,17 +33,7 @@ KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger) {
     var filters = opts && opts.filters;
     var uniqueBy = opts && opts.uniqueBy;
 
-    var q;
-    if (filters) {
-      q = _.transform(filters, function(result, value, key) {
-        if (key === '__custom__' && _.isFunction(value)) {
-          value(result);
-        } else if (!(_.isNil(value) || (_.isString(value) && !value))) {
-          result[key] = valueToFilter(value);
-        }
-      }, {});
-    }
-
+    const q = applyFilters();
     var cursor = model.find(q);
 
     if (uniqueBy) {
@@ -47,14 +41,7 @@ KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger) {
     }
 
     if (pagination) {
-      if (pagination.page) {
-        krkLogger.assert(pagination.count > 0);
-        cursor.skip((pagination.page - 1) * pagination.count)
-          .limit(pagination.count);
-      }
-      if (pagination.sortBy) {
-        cursor.sort(_.fromPairs([[pagination.sortBy, pagination.asc ? 1 : -1]]));
-      }
+      applyPagination(cursor, pagination);
     }
 
     return cursor;
@@ -80,6 +67,31 @@ KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger) {
       };
     } else {
       krkLogger.assert(false, `Unsupported value type: ${value}`);
+    }
+  }
+
+  function applyPagination(cursor, pagination) {
+    if (pagination) {
+      if (pagination.page) {
+        krkLogger.assert(pagination.count > 0);
+        cursor.skip((pagination.page - 1) * pagination.count)
+          .limit(pagination.count);
+      }
+      if (pagination.sortBy) {
+        cursor.sort(_.fromPairs([[pagination.sortBy, pagination.asc ? 1 : -1]]));
+      }
+    }
+  }
+
+  function applyFilters(cursor, filters) {
+    if (filters) {
+      return _.transform(filters, function(result, value, key) {
+        if (key === '__custom__' && _.isFunction(value)) {
+          value(result);
+        } else if (!(_.isNil(value) || (_.isString(value) && !value))) {
+          result[key] = valueToFilter(value);
+        }
+      }, {});
     }
   }
 });
