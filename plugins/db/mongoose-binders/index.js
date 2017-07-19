@@ -33,7 +33,7 @@ KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger) {
     var filters = opts && opts.filters;
     var uniqueBy = opts && opts.uniqueBy;
 
-    const q = applyFilters();
+    const q = applyFilters(cursor, filters);
     var cursor = model.find(q);
 
     if (uniqueBy) {
