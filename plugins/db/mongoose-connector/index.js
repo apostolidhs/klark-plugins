@@ -25,7 +25,7 @@ KlarkModule(module, 'krkDbMongooseConnector', function(q, $mongoose, krkLogger) 
 
     var deffered = q.defer();
     decorateMongoosePromises();
-    $mongoose.connect(mongodbUrl);
+    $mongoose.connect(mongodbUrl, { useMongoClient: true });
     var db = $mongoose.connection;
     db.on('error', function(err) {
       krkLogger.error('Connection error:', err);

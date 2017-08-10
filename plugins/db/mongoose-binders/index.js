@@ -5,6 +5,7 @@ KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger) {
   return {
     create: create,
     findByIdAndUpdate: findByIdAndUpdate,
+    findOneAndUpdate: findOneAndUpdate,
     findById: findById,
     find: find,
     count: count,
@@ -21,6 +22,10 @@ KlarkModule(module, 'krkDbMongooseBinders', function(_, $mongoose, krkLogger) {
 
   function findByIdAndUpdate(model, id, record) {
     return model.findByIdAndUpdate(id, record, {new: true});
+  }
+
+  function findOneAndUpdate(model, q, record) {
+    return  model.findOneAndUpdate(q, record, {new: true});
   }
 
   function findById(model, id) {

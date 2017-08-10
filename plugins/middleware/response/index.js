@@ -22,7 +22,7 @@ KlarkModule(module, 'krkMiddlewareResponse', function(_) {
   function fail(err, req, res, next) {
     if (err !== true) {
       let msg;
-      if (options.showStackError === 'dev') {
+      if (options.showStackError) {
         msg = {
           msg: err.message,
           stack: err.stack
