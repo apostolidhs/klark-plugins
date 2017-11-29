@@ -24,14 +24,17 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
       && config.apiUrlPrefix
       && config.appUrl
       && config.apiUrl
-      && config.EMAIL_SMTP
-      && config.EMAIL_NAME
-      && config.EMAIL_ADDRESS
-      && config.name)) {
+      && config.name
+      && config.emailSmtp
+      && config.emailName
+      && config.emailAddress
+    )) {
       throw new Error('Invalid arguments');
     }
 
     config.adminValidationOnSignup = config.adminValidationOnSignup || true;
+    config.verifyAccountEmailTmpl = config.verifyAccountEmailTmpl || getDefaultVerificationEmail;
+    config.resetPasswordEmailTmpl = config.resetPasswordEmailTmpl || getDefaultResetPasswordEmail;
 
     app.post('/' + config.apiUrlPrefix + '/authorize/signup', [
       krkMiddlewarePermissions.check('FREE'),
@@ -89,14 +92,10 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
         });
     }
 
-
     function middlewareSignupParameterValidator(req, res, next) {
       var validationOpts = [
-        {path: 'name', value: req.body.name, onValidate: function(v) { return res.locals.params.name = v;}},
         {path: 'email', value: req.body.email, onValidate: function(v) { return res.locals.params.email = v;}},
-        {path: 'password', value: req.body.password, onValidate: function(v) { return res.locals.params.password = v;}},
-        {path: 'phone', value: req.body.phone, onValidate: function(v) { return res.locals.params.phone = v;}},
-        {path: 'preferences', value: req.body.preferences, onValidate: function(v) { return res.locals.params.preferences = v;}}
+        {path: 'password', value: req.body.password, onValidate: function(v) { return res.locals.params.password = v;}}
       ];
       krkParameterValidator.modelPartialValidator(krkModelsUser, validationOpts)
         .then(function() { return next(); })
@@ -108,7 +107,7 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
 
     function middlewareLoginParameterValidator(req, res, next) {
       var validationOpts = [
-        {path: 'name', value: req.body.name, onValidate: function(v) { return res.locals.params.name = v;}},
+        {path: 'email', value: req.body.email, onValidate: function(v) { return res.locals.params.email = v;}},
         {path: 'password', value: req.body.password, onValidate: function(v) { return res.locals.params.password = v;}}
       ];
       krkParameterValidator.modelPartialValidator(krkModelsUser, validationOpts)
@@ -143,32 +142,25 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
             next(true);
           })
         .then(function(validationToken) {
-          return new krkModelsUser({
+          const userObj = {
             validationToken: validationToken.toString('hex'),
             email: res.locals.params.email,
-            name: res.locals.params.name,
             password: res.locals.params.password,
-            phone: res.locals.params.phone,
-            validatedByAdmin: config.adminValidationOnSignup,
-            role: 'USER',
-            preferences: res.locals.params.preferences
-          });
+            role: 'USER'
+          };
+          if (config.adminValidationOnSignup) {
+            userObj.validatedByAdmin = false;
+          }
+          return new krkModelsUser(userObj);
         })
         .then(function(user) {
-          if (process.env.UNIT_TEST) {
-            krkLogger.info('send mock verification email to ' + user.name);
-            return user;
-          }
-          var emailTemplate = krkRoutersAuthorizeVerifyAccountEmailTmpl.template({
-            verifyAccountRoute: verifyAccountRoute,
-            user: user,
-            name: config.name,
-            apiUrl: config.apiUrl
-          });
-          return krkNotificationsEmail.send(emailTemplate, {
-            EMAIL_SMTP: config.EMAIL_SMTP,
-            EMAIL_NAME: config.EMAIL_NAME,
-            EMAIL_ADDRESS: config.EMAIL_ADDRESS
+          return user.sendVerificationEmail({
+            apiUrl: config.apiUrl,
+            apiUrlPrefix: config.apiUrlPrefix,
+            verifyAccountEmailTmpl: config.verifyAccountEmailTmpl,
+            emailSmtp: config.emailSmtp,
+            emailName: config.emailName,
+            emailAddress: config.emailAddress
           })
             .catch(function(reason) {
               res.locals.errors.add('EMAIL_FAIL', reason.errors || reason);
@@ -194,7 +186,7 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
     }
 
     function middlewareLoginController(req, res, next) {
-      krkModelsUser.findOne({name: res.locals.params.name})
+      krkModelsUser.findOne({email: res.locals.params.email})
           .catch(function(reason) { return error('DB_ERROR', reason); })
         .then(function(user) {
           if (!user) {
@@ -276,7 +268,7 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
             if (!user) {
               return next();
             }
-            let newPassword = $crypto.randomBytes(16).toString('hex');
+            var newPassword = $crypto.randomBytes(16).toString('hex');
             q.resolve()
               .then(function() {
                 user.password = newPassword;
@@ -288,16 +280,14 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
               })
               .then(function(user) {
                 res.locals.data = user.getSafely();
-                var emailTemplate = krkRoutersAuthorizeResetPasswordEmailTmpl.template({
+                return user.sendResetPasswordEmail({
                   password: newPassword,
-                  user: user,
                   name: config.name,
-                  appUrl: config.appUrl
-                });
-                return krkNotificationsEmail.send(emailTemplate, {
-                  EMAIL_SMTP: config.EMAIL_SMTP,
-                  EMAIL_NAME: config.EMAIL_NAME,
-                  EMAIL_ADDRESS: config.EMAIL_ADDRESS
+                  appUrl: config.appUrl,
+                  resetPasswordEmailTmpl: config.resetPasswordEmailTmpl,
+                  emailSmtp: config.emailSmtp,
+                  emailName: config.emailName,
+                  emailAddress: config.emailAddress
                 })
                 .catch(function(reason) {
                   res.locals.errors.add('EMAIL_FAIL', reason.errors || reason);
@@ -310,6 +300,23 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
               })
               .then(function() { return next(); });
           })
+    }
+
+    function getDefaultVerificationEmail(opts) {
+      return krkRoutersAuthorizeVerifyAccountEmailTmpl.template({
+        verifyUrl: opts.verifyUrl,
+        user: opts.user,
+        apiUrl: opts.apiUrl
+      });
+    }
+
+    function getDefaultResetPasswordEmail(opts) {
+      return krkRoutersAuthorizeResetPasswordEmailTmpl.template({
+        password: opts.newPassword,
+        user: opts.user,
+        name: opts.name,
+        appUrl: opts.appUrl
+      });
     }
   }
 

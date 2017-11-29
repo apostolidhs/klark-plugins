@@ -8,7 +8,6 @@ KlarkModule(module, 'krkRoutesUsers', function(
   krkRoutersAuthorizeVerifyAccountEmailTmpl,
   krkParameterValidator,
   krkCrudGenerator,
-  krkNotificationsEmail,
   krkMiddlewareParameterValidator,
   krkMiddlewareResponse,
   krkMiddlewareCrudController,
@@ -20,10 +19,18 @@ KlarkModule(module, 'krkRoutesUsers', function(
   };
 
   function register(app, config) {
-    if (!(app && config && config.apiUrl && config.apiUrlPrefix && config.name
-        && config.EMAIL_SMTP && config.EMAIL_NAME  && config.EMAIL_ADDRESS)) {
+    if (!(app
+      && config
+      && config.apiUrl
+      && config.apiUrlPrefix
+      && config.emailSmtp
+      && config.emailName
+      && config.emailAddress
+    )) {
       throw new Error('Invalid arguments');
     }
+
+    config.verifyAccountEmailTmpl = config.verifyAccountEmailTmpl || getDefaultVerificationEmail;
 
     const crudOpts = {
       model: krkModelsUser,
@@ -45,9 +52,7 @@ KlarkModule(module, 'krkRoutesUsers', function(
 
     function middlewareUpdateParameterValidator(req, res, next) {
       var possibleValues = [
-        'name',
         'email',
-        'phone',
         'newPassword',
         'oldPassword',
         'role'
@@ -128,14 +133,6 @@ KlarkModule(module, 'krkRoutesUsers', function(
           jobPromises.push(checkEmail(res, user));
         }
 
-        if (_.find(fulfilled, function(v) { return v.value === 'name'; })) {
-          user.name = res.locals.params.name;
-        }
-
-        if (_.find(fulfilled, function(v) { return v.value === 'phone'; })) {
-          user.phone = res.locals.params.phone;
-        }
-
         if (_.find(fulfilled, function(v) { return v.value === 'role'; })) {
           if (res.locals.user.role !== 'ADMIN') {
             res.locals.errors.add('INVALID_PARAMS', 'Not admin user');
@@ -167,7 +164,8 @@ KlarkModule(module, 'krkRoutesUsers', function(
 
     function checkEmail(res, user) {
       return q.promisify(function(cb) {
-        return $crypto.randomBytes(32, cb); })
+            return $crypto.randomBytes(32, cb);
+          })
           .catch(function(reason) {
             return res.locals.errors.add('NOT_ENOUGH_ENTROPY', reason);
           })
@@ -178,19 +176,15 @@ KlarkModule(module, 'krkRoutesUsers', function(
             return res.locals.errors.add('DB_ERROR', reason.errors || reason);
           })
         .then(function(updatedUser) {
-          var verifyAccountRoute = '/' + config.apiUrlPrefix + '/authorize/verifyAccount';
-          updatedUser.email = res.locals.params.email
-          var emailTemplate = krkRoutersAuthorizeVerifyAccountEmailTmpl.template({
-            verifyAccountRoute: verifyAccountRoute,
-            user: updatedUser,
-            name: config.name,
-            apiUrl: config.apiUrl
-          });
-          return krkNotificationsEmail.send(emailTemplate, {
-              EMAIL_SMTP: config.EMAIL_SMTP,
-              EMAIL_NAME: config.EMAIL_NAME,
-              EMAIL_ADDRESS: config.EMAIL_ADDRESS
-            })
+          updatedUser.email = res.locals.params.email;
+          return updatedUser.sendVerificationEmail({
+            apiUrl: config.apiUrl,
+            apiUrlPrefix: config.apiUrlPrefix,
+            verifyAccountEmailTmpl: config.verifyAccountEmailTmpl,
+            emailSmtp: config.emailSmtp,
+            emailName: config.emailName,
+            emailAddress: config.emailAddress
+          })
             .catch(function(reason) {
               return res.locals.errors.add('EMAIL_FAIL', reason.errors || reason);
             })
@@ -216,6 +210,14 @@ KlarkModule(module, 'krkRoutesUsers', function(
       })
       .catch(function(reason) {
         res.locals.errors.add('INVALID_PARAMS', 'invalid-password');
+      });
+    }
+
+    function getDefaultVerificationEmail(opts) {
+      return krkRoutersAuthorizeVerifyAccountEmailTmpl.template({
+        verifyUrl: opts.verifyUrl,
+        user: opts.user,
+        apiUrl: opts.apiUrl
       });
     }
   }

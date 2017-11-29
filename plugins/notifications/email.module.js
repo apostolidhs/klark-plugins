@@ -7,17 +7,17 @@ KlarkModule(module, 'krkNotificationsEmail', function(_, q, $nodemailer) {
   };
 
   function send(opts, config) {
-    if (!(config.EMAIL_SMTP && config.EMAIL_NAME && config.EMAIL_ADDRESS)) {
+    if (!(config.emailSmtp && config.emailName && config.emailAddress)) {
       throw new Error('Invalid arguments');
     }
     var to = _.castArray(opts.to);
     var subject = opts.subject;
     var content = opts.content;
 
-    var transporter = $nodemailer.createTransport(config.EMAIL_SMTP);
+    var transporter = $nodemailer.createTransport(config.emailSmtp);
 
-    var from = config.EMAIL_NAME ? '"' + config.EMAIL_NAME + '" <' + config.EMAIL_ADDRESS + '>'
-                  : config.EMAIL_ADDRESS;
+    var from = config.emailName ? '"' + config.emailName + '" <' + config.emailAddress + '>'
+                  : config.emailAddress;
 
     var mailOptions = {
         from, // sender address

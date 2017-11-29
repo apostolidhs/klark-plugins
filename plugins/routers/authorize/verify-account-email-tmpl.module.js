@@ -1,22 +1,21 @@
 'use strict';
 
-KlarkModule(module, 'krkRoutersAuthorizeVerifyAccountEmailTmpl', function(config) {
+KlarkModule(module, 'krkRoutersAuthorizeVerifyAccountEmailTmpl', function() {
 
   return {
     template: template
   };
 
   function template(config) {
-    if (!(config && config.user && config.verifyAccountRoute && config.name && config.apiUrl)) {
+    if (!(config && config.user && config.verifyUrl && config.apiUrl)) {
       throw new Error('Invalid arguments');
     }
-    var subject = config.name + ' Πιστοποιήστε τον λογαριασμό σας';
+    var subject = 'Πιστοποιήστε τον λογαριασμό σας';
 
-    var verifyUrl = [config.apiUrl, config.verifyAccountRoute, '?token=', config.user.validationToken].join('');
     var content = '\
-      Κε/Κα ' + config.name + ',\
-      <p>Ευχαριστούμε για την εγγραφή σας στην εφαρμογή <strong>RFS-iSAFE WebApp!</strong><br>\
-      Παρακαλούμε πατήστε <a href="' + verifyUrl + '">εδώ</a> για να ολοκληρωθεί η εγγραφή σας.</p>\
+      Κε/Κα ' + config.user.email + ',\
+      <p>Ευχαριστούμε για την εγγραφή σας στην εφαρμογή<br>\
+      Παρακαλούμε πατήστε <a href="' + config.verifyUrl + '">εδώ</a> για να ολοκληρωθεί η εγγραφή σας.</p>\
       Με εκτίμηση,    \
     ';
 
