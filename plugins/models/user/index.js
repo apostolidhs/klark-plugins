@@ -17,6 +17,7 @@ KlarkModule(module, 'krkModelsUserExtension', function(
   const defaultOpts = {
     validatedByAdmin: true,
     userAccountValidationPeriod: 1 * 24 * 60 * 60 * 1000,
+    supportedLanguages: ['en'],
     onSchemaOptions: _.identity,
     onSchemaMethods: _.identity
   };
@@ -31,11 +32,12 @@ KlarkModule(module, 'krkModelsUserExtension', function(
     var schemaOpts = {
       email: {type: $mongoose.SchemaTypes.Email, unique: true, required: true},
       password: {type: String},
-      lastLogin: {type: Date, required: true, default: Date.now},
-      validationExpiresAt: { type: Date, default: Date.now, expires: options.userAccountValidationPeriod },
+      lastLogin: {type: Date, default: Date.now},
+      validationExpiresAt: { type: Date, expires: options.userAccountValidationPeriod },
       validationToken: {type: String, maxlength: [64]},
-      totalLogins: {type: Number, required: true, min: 0, default: 0},
-      role: {type: String, enum: krkMiddlewarePermissionsRoles, required: true}
+      totalLogins: {type: Number, min: 0, default: 0},
+      role: {type: String, enum: krkMiddlewarePermissionsRoles, required: true},
+      lang: {type: String, enum: options.supportedLanguages, default: options.supportedLanguages[0]},
     };
 
     if (options.validatedByAdmin) {
@@ -119,7 +121,6 @@ KlarkModule(module, 'krkModelsUserExtension', function(
       && config.apiUrlPrefix
       && config.verifyAccountEmailTmpl
       && config.emailSmtp
-      && config.emailName
       && config.emailAddress
     )) {
       throw new Error('Invalid arguments');
@@ -154,13 +155,12 @@ KlarkModule(module, 'krkModelsUserExtension', function(
       && config.password
       && config.resetPasswordEmailTmpl
       && config.emailSmtp
-      && config.emailName
       && config.emailAddress
     )) {
       throw new Error('Invalid arguments');
     }
 
-    var emailTemplate = config.resetPasswordEmailTmpl.template({
+    var emailTemplate = config.resetPasswordEmailTmpl({
       password: config.password,
       user: this,
       name: config.name,

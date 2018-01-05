@@ -7,14 +7,28 @@ KlarkModule(module, 'krkNotificationsEmail', function(_, q, $nodemailer) {
   };
 
   function send(opts, config) {
-    if (!(config.emailSmtp && config.emailName && config.emailAddress)) {
+    if (!(config.emailSmtp && config.emailAddress)) {
       throw new Error('Invalid arguments');
     }
     var to = _.castArray(opts.to);
     var subject = opts.subject;
     var content = opts.content;
 
-    var transporter = $nodemailer.createTransport(config.emailSmtp);
+    var ma = config.emailSmtp;
+// var ma = {
+//   host: "smtp-mail.outlook.com", // hostname
+//   secureConnection: false, // TLS requires secureConnection to be false
+//   port: 587, // port for secure SMTP
+//   auth: {
+//       user: "info@wiregoose.com",
+//       pass: "MikroMouPony!@#"
+//   },
+//   tls: {
+//       ciphers:'SSLv3'
+//   }
+// };
+
+    var transporter = $nodemailer.createTransport(ma);
 
     var from = config.emailName ? '"' + config.emailName + '" <' + config.emailAddress + '>'
                   : config.emailAddress;

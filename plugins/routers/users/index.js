@@ -24,7 +24,6 @@ KlarkModule(module, 'krkRoutesUsers', function(
       && config.apiUrl
       && config.apiUrlPrefix
       && config.emailSmtp
-      && config.emailName
       && config.emailAddress
     )) {
       throw new Error('Invalid arguments');

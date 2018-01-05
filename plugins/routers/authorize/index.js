@@ -26,7 +26,6 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
       && config.apiUrl
       && config.name
       && config.emailSmtp
-      && config.emailName
       && config.emailAddress
     )) {
       throw new Error('Invalid arguments');
@@ -95,8 +94,22 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
     function middlewareSignupParameterValidator(req, res, next) {
       var validationOpts = [
         {path: 'email', value: req.body.email, onValidate: function(v) { return res.locals.params.email = v;}},
-        {path: 'password', value: req.body.password, onValidate: function(v) { return res.locals.params.password = v;}}
+        {path: 'password', value: req.body.password, onValidate: function(v) { return res.locals.params.password = v;}},
+        {path: 'lang', value: req.body.lang, onValidate: function(v) { return res.locals.params.lang = v;}}
       ];
+
+      // If we marked it as non-required in the schema
+      if (!validationOpts[0].value) {
+        res.locals.errors.add('INVALID_PARAMS', ['invalid password']);
+        return next(true);
+      }
+
+      const pass = validationOpts[1].value;
+      if (!(_.isString(pass) && pass.length >= 6)) {
+        res.locals.errors.add('INVALID_PARAMS', ['invalid email address']);
+        return next(true);
+      }
+
       krkParameterValidator.modelPartialValidator(krkModelsUser, validationOpts)
         .then(function() { return next(); })
         .catch(function(reason) {
@@ -136,16 +149,25 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
     }
 
     function middlewareSignUpController(req, res, next) {
-      q.promisify(function(cb) { return $crypto.randomBytes(32, cb); })
+      krkModelsUser.findOne({email: res.locals.params.email})
+        .then(user => {
+          if (user) {
+            res.locals.errors.add('ALREADY_EXIST');
+            throw new Error();
+          }
+        })
+        .then(() => q.promisify(function(cb) { return $crypto.randomBytes(32, cb); })
           .catch(function(reason) {
             res.locals.errors.add('NOT_ENOUGH_ENTROPY', reason);
-            next(true);
-          })
+            throw new Error();
+          }))
         .then(function(validationToken) {
           const userObj = {
             validationToken: validationToken.toString('hex'),
+            validationExpiresAt: new Date(),
             email: res.locals.params.email,
             password: res.locals.params.password,
+            lang: res.locals.params.lang,
             role: 'USER'
           };
           if (config.adminValidationOnSignup) {
@@ -162,27 +184,28 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
             emailName: config.emailName,
             emailAddress: config.emailAddress
           })
+          .catch(function(reason) {
+            res.locals.errors.add('EMAIL_FAIL', reason.errors || reason);
+            next(true);
+          })
+          .then(function() { return user; })
+        })
+        .then(function(newUser) {
+          return newUser.save()
             .catch(function(reason) {
-              res.locals.errors.add('EMAIL_FAIL', reason.errors || reason);
-              next(true);
+              if (reason.code === 11000) {
+                res.locals.errors.add('ALREADY_EXIST');
+              } else {
+                res.locals.errors.add('DB_ERROR', reason.errors || reason);
+              }
+              throw new Error();
             })
-            .then(function() { return user; });
         })
         .then(function(newUser) {
-          return newUser.save();
+          res.locals.data = newUser.getSafely();
+          return next();
         })
-        .catch(function(reason) {
-          if (reason.code === 11000) {
-            res.locals.errors.add('ALREADY_EXIST');
-          } else {
-            res.locals.errors.add('DB_ERROR', reason.errors || reason);
-          }
-          next(true);
-        })
-        .then(function(newUser) {
-          return res.locals.data = newUser.getSafely();
-        })
-        .then(function() { return next(); });
+        .catch(function() { return next(true); });
     }
 
     function middlewareLoginController(req, res, next) {
@@ -193,7 +216,7 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
             return error('UNAUTHORIZED_USER');
           }
 
-          return user.comparePassword(req.body.password)
+          return user.comparePassword(res.locals.params.password)
             .then(function(isEqual) {
               res.locals.data = krkMiddlewarePermissions.createJWT(user);
               user.updateLoginInfo();
@@ -219,7 +242,7 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
             return next(true);
           }
 
-          res.locals.redirect = config.appUrl + '/#/?validated=' + updated._id + '?email=' + updated.email;
+          res.locals.redirect = config.appUrl + '?validated=' + updated.email;
           next();
         });
     }
@@ -260,46 +283,46 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
 
     function middlewareResetPasswordController(req, res, next) {
       krkModelsUser.findOne({email: res.locals.params.email})
-          .catch(function(reason) {
-            res.locals.errors.add('DB_ERROR', reason);
-            return next(true);
+        .catch(function(reason) {
+          res.locals.errors.add('DB_ERROR', reason);
+          throw new Error();
+        })
+        .then(user => {
+          if (!user) {
+            return next();
+          }
+
+          q.promisify(function(cb) { return $crypto.randomBytes(16, cb); })
+            .catch(function(reason) {
+              res.locals.errors.add('NOT_ENOUGH_ENTROPY', reason);
+              throw new Error();
+            })
+          .then(function(newPassword) {
+            user.password = newPassword.toString('hex');
+            return user.sendResetPasswordEmail({
+              password: user.password,
+              name: config.name,
+              appUrl: config.appUrl,
+              resetPasswordEmailTmpl: config.resetPasswordEmailTmpl,
+              emailSmtp: config.emailSmtp,
+              emailName: config.emailName,
+              emailAddress: config.emailAddress
+            })
+            .catch(function(reason) {
+              res.locals.errors.add('EMAIL_FAIL', reason.errors || reason);
+              throw new Error();
+            });
           })
-          .then(user => {
-            if (!user) {
-              return next();
-            }
-            var newPassword = $crypto.randomBytes(16).toString('hex');
-            q.resolve()
-              .then(function() {
-                user.password = newPassword;
-                return user.save();
-              })
+          .then(function() {
+            return user.save()
               .catch(function(reason) {
                 res.locals.errors.add('DB_ERROR', reason.errors || reason);
-                next(true);
+                throw new Error();
               })
-              .then(function(user) {
-                res.locals.data = user.getSafely();
-                return user.sendResetPasswordEmail({
-                  password: newPassword,
-                  name: config.name,
-                  appUrl: config.appUrl,
-                  resetPasswordEmailTmpl: config.resetPasswordEmailTmpl,
-                  emailSmtp: config.emailSmtp,
-                  emailName: config.emailName,
-                  emailAddress: config.emailAddress
-                })
-                .catch(function(reason) {
-                  res.locals.errors.add('EMAIL_FAIL', reason.errors || reason);
-                  next(true);
-                });
-              })
-              .catch(function(reason) {
-                res.locals.errors.add('UNEXPECTED', reason.errors || reason);
-                next(true);
-              })
-              .then(function() { return next(); });
           })
+          .then(function() { return next(); })
+          .catch(function(reason) { return next(true); })
+        })
     }
 
     function getDefaultVerificationEmail(opts) {

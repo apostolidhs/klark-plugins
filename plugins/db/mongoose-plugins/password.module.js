@@ -15,7 +15,7 @@ KlarkModule(module, 'krkDbMongoosePluginsPassword', function(_, q, $bcrypt, krkL
     function encryptPassword(next) {
       var user = this;
 
-      if (!this.isModified(passField) && !this.isNew) {
+      if (!this.isModified(passField) && !this.isNew || !user[passField]) {
         return next();
       }
 
@@ -24,7 +24,7 @@ KlarkModule(module, 'krkDbMongoosePluginsPassword', function(_, q, $bcrypt, krkL
       })
       .then(function(salt) {
         return q.promisify(function(cb) {
-          return $bcrypt.hash(user.password, salt, cb);
+          return $bcrypt.hash(user[passField], salt, cb);
         });
       })
       .then(function(hash) {
