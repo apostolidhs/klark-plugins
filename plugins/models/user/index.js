@@ -66,35 +66,6 @@ KlarkModule(module, 'krkModelsUserExtension', function(
     return $mongoose.model('User', schema);
   }
 
-
-  // seconds, after signup of the account, how long will the user remain until it will be validated
-  // var USER_ACCOUNT_VALIDATION_PERIOD = 1 * 24 * 60 * 60 * 1000;
-  // krkDbMongooseConnector.decorateMongoosePromises();
-
-  // var schema = new $mongoose.Schema({
-  //   name: {type: String, maxlength: [64], unique: true, required: true},
-  //   email: {type: $mongoose.SchemaTypes.Email, unique: true, required: true},
-  //   password: {type: String, required: true},
-  //   phone: {type: String, maxlength: [32]},
-  //   lastLogin: {type: Date, required: true, default: Date.now},
-  //   validationExpiresAt: { type: Date, default: Date.now, expires: USER_ACCOUNT_VALIDATION_PERIOD },
-  //   validationToken: {type: String, maxlength: [64]},
-  //   totalLogins: {type: Number, required: true, min: 0, default: 0},
-  //   role: {type: String, enum: krkMiddlewarePermissionsRoles, required: true},
-  //   validatedByAdmin: {type: Boolean, required: true},
-  //   preferences: {type: $mongoose.Schema.Types.Mixed}
-  // });
-
-  // schema.plugin(krkDbMongoosePluginsPassword, { passwordField: 'password' });
-  // schema.plugin($mongooseCreatedmodified.createdModifiedPlugin);
-  // schema.methods.getSafely = getSafely;
-  // schema.methods.updateLoginInfo = updateLoginInfo;
-  // schema.statics.verifyAccount = verifyAccount;
-  // schema.statics.invalidateAccount = invalidateAccount;
-  // schema.statics.validateByAdmin = validateByAdmin;
-
-  // return $mongoose.model('User', schema);
-
   function getSafely() {
     var userObj = this.toObject();
     var safeUser = _.omit(userObj, [
