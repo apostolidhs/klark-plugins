@@ -51,12 +51,14 @@ KlarkModule(module, 'krkMiddlewareCrudController', function(_, q, krkDbMongooseB
 
       q.all([
         krkDbMongooseBinders.find(model, findOpts),
-        krkDbMongooseBinders.count(model)
+        krkDbMongooseBinders.count(model),
+        (findOpts.filters || findOpts.uniqueBy) && krkDbMongooseBinders.find(model, findOpts).count()
       ])
       .then(function(resolvedPromises) {
         var data = {};
         data.content = resolvedPromises[0];
         data.total = resolvedPromises[1];
+        data.filteredTotal = resolvedPromises[2];
         res.locals.data = data;
 
         next();
