@@ -43,16 +43,18 @@ KlarkModule(module, 'krkMiddlewareCrudController', function(_, q, krkDbMongooseB
 
   function retrieveAllCtrl(model) {
     return function(req, res, next) {
-      var findOpts = {
-        pagination: res.locals.params.pagination,
+      var filterOpts = {
         filters: res.locals.params.filters,
         uniqueBy: res.locals.params.uniqueBy
       };
+      var findOpts = _.assignIn({
+        pagination: res.locals.params.pagination,
+      }, filterOpts);
 
       q.all([
         krkDbMongooseBinders.find(model, findOpts),
         krkDbMongooseBinders.count(model),
-        (findOpts.filters || findOpts.uniqueBy) && krkDbMongooseBinders.find(model, findOpts).count()
+        (filterOpts.filters || filterOpts.uniqueBy) && krkDbMongooseBinders.find(model, filterOpts).count()
       ])
       .then(function(resolvedPromises) {
         var data = {};
