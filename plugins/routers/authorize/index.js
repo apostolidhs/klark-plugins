@@ -100,13 +100,13 @@ KlarkModule(module, 'krkRoutesAuthorize', function(
 
       // If we marked it as non-required in the schema
       if (!validationOpts[0].value) {
-        res.locals.errors.add('INVALID_PARAMS', ['invalid email address']);
+        res.locals.errors.add('INVALID_PARAMS', 'invalid email address');
         return next(true);
       }
 
       const pass = validationOpts[1].value;
       if (!(_.isString(pass) && pass.length >= 6)) {
-        res.locals.errors.add('INVALID_PARAMS', ['invalid password']);
+        res.locals.errors.add('INVALID_PARAMS', 'invalid password');
         return next(true);
       }
 
