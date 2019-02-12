@@ -82,6 +82,8 @@ KlarkModule(module, 'krkParameterValidator', (q, _, $expressValidator) => {
             return false;
           } else if (validatorModel.message === 'url is invalid') {
             return false;
+          } else if (validatorModel.type === 'user defined') {
+            return false;
           } else {
             return !validatorModel.validator(path.cast(opt.value));
           }
